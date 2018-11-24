@@ -1,0 +1,3 @@
+[submodule "external/SwiftHamcrest"]
+	path = external/SwiftHamcrest
+	url = https://github.com/nicolaschriste/SwiftHamcrest.git
