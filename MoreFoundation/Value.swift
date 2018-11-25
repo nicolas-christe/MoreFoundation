@@ -40,7 +40,7 @@ public class Value<T>: Observable<T?> {
         }.disposed(by: disposeBag)
     }
 
-    override public func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<T?> {
+    override public func subscribe(_ observer: Observer<T?>) -> Disposable {
         let result = super.subscribe(observer)
         if value != nil {
             on(.next(value))

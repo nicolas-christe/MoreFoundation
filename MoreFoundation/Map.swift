@@ -31,7 +31,7 @@ private class Map<T, U>: Observable<U> {
         self.transform = transform
     }
 
-    override func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<U> {
+    override func subscribe(_ observer: Observer<U>) -> Disposable {
         let disposable = super.subscribe(observer)
         if let source = source {
             source.subscribe { event in

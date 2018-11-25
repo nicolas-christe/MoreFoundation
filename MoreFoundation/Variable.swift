@@ -33,7 +33,7 @@ public class Variable<T>: Observable<T> {
         super.init()
     }
 
-    override public func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<T> {
+    override public func subscribe(_ observer: Observer<T>) -> Disposable {
         let result = super.subscribe(observer)
         on(.next(value))
         return result

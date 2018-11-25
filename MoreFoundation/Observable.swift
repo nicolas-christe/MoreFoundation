@@ -34,14 +34,9 @@ public enum EventHandler<T> {
     case onTerminated(() -> Void)
 }
 
-public protocol ObserverType: AnyObject {
-    associatedtype EventType
-    func on(_ event: EventType)
-}
-
 public class Observable<T> {
 
-    private var observers = [ObjectIdentifier: (Event<T>) -> Void]()
+    private var observers = [ObjectIdentifier: Observer<T>]()
 
     private let willBeObserved: () -> Void
     private let wasObserved: () -> Void
@@ -55,18 +50,18 @@ public class Observable<T> {
         on(.terminated)
     }
 
-    public func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<T> {
+    public func subscribe(_ observer: Observer<T>) -> Disposable {
         if observers.isEmpty {
             willBeObserved()
         }
         let identifier = ObjectIdentifier(observer)
-        observers[identifier] = observer.on
+        observers[identifier] = observer
         return Registration(observable: self, identifier: identifier)
     }
 
     public func on(_ event: Event<T>) {
         observers.values.forEach {
-            $0(event)
+            $0.on(event)
         }
     }
 
@@ -93,7 +88,7 @@ public class Observable<T> {
     }
 }
 
-public class Observer<T>: ObserverType {
+public class Observer<T> {
 
     private let handlers: [EventHandler<T>]
 
