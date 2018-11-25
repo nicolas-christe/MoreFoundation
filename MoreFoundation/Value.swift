@@ -30,9 +30,9 @@ public class Value<T>: Observable<T?> {
         super.init()
         source.subscribe { event in
             switch event {
-            case .value(let value):
+            case .next(let value):
                 self.value = value
-                self.on(.value(value))
+                self.on(.next(value))
             case .terminated:
                 self.value = nil
                 self.on(.terminated)
@@ -43,7 +43,7 @@ public class Value<T>: Observable<T?> {
     override public func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<T?> {
         let result = super.subscribe(observer)
         if value != nil {
-            on(.value(value))
+            on(.next(value))
         }
         return result
     }

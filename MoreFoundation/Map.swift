@@ -36,8 +36,8 @@ private class Map<T, U>: Observable<U> {
         if let source = source {
             source.subscribe { event in
                 switch event {
-                case .value(let value):
-                    self.on(.value(self.transform(value)))
+                case .next(let value):
+                    self.on(.next(self.transform(value)))
                 case .terminated:
                     self.disposeBag.dispose()
                 }

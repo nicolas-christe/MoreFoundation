@@ -21,7 +21,7 @@
 import Foundation
 
 public enum Event<T> {
-    case value(T)
+    case next(T)
     case terminated
 }
 
@@ -30,7 +30,7 @@ extension Event: Equatable where T: Equatable {
 
 public enum EventHandler<T> {
     case onEvent((Event<T>) -> Void)
-    case onValue((T) -> Void)
+    case onNext((T) -> Void)
     case onTerminated(() -> Void)
 }
 
@@ -110,7 +110,7 @@ public class Observer<T>: ObserverType {
             switch ($0, event) {
             case let (.onEvent(eventHandler), _):
                 eventHandler(event)
-            case let (.onValue(valueHandler), .value(value)):
+            case let (.onNext(valueHandler), .next(value)):
                 valueHandler(value)
             case let (.onTerminated(terminatedHandler), .terminated):
                 terminatedHandler()

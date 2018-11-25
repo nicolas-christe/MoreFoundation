@@ -36,7 +36,7 @@ class ObservableTests: XCTestCase {
             willBeObserved: { willBeObservedCnt += 1},
             wasObserved: { wasObserved += 1})
 
-        observable.on(.value("1"))
+        observable.on(.next("1"))
         assertThat(willBeObservedCnt, `is`(0))
         assertThat(wasObserved, `is`(0))
 
@@ -69,25 +69,25 @@ class ObservableTests: XCTestCase {
 
         // check observer is notified
         observable.subscribe { events1.append($0) }.disposed(by: bag1)
-        observable.on(.value("X"))
-        assertThat(events1, contains(.value("X")))
+        observable.on(.next("X"))
+        assertThat(events1, contains(.next("X")))
 
         // check 2nd observer is also notified
         observable.subscribe({events2.append($0)}).disposed(by: bag2)
-        observable.on(.value("Y"))
-        assertThat(events1, contains(.value("X"), .value("Y")))
-        assertThat(events2, contains(.value("Y")))
+        observable.on(.next("Y"))
+        assertThat(events1, contains(.next("X"), .next("Y")))
+        assertThat(events2, contains(.next("Y")))
 
         // check that unregisted observers are not notified
         bag1.dispose()
-        observable.on(.value("Z"))
-        assertThat(events1, contains(.value("X"), .value("Y")))
-        assertThat(events2, contains(.value("Y"), .value("Z")))
+        observable.on(.next("Z"))
+        assertThat(events1, contains(.next("X"), .next("Y")))
+        assertThat(events2, contains(.next("Y"), .next("Z")))
 
         // check terminated
         observable = nil
-        assertThat(events1, contains(.value("X"), .value("Y")))
-        assertThat(events2, contains(.value("Y"), .value("Z"), .terminated))
+        assertThat(events1, contains(.next("X"), .next("Y")))
+        assertThat(events2, contains(.next("Y"), .next("Z"), .terminated))
     }
 
     func testHandlers() {
@@ -99,7 +99,7 @@ class ObservableTests: XCTestCase {
 
         observable?.subscribe(
             .onEvent { events.append($0) },
-            .onValue { values.append($0) },
+            .onNext { values.append($0) },
             .onTerminated { terminated += 1})
         .disposed(by: bag)
 
@@ -107,13 +107,13 @@ class ObservableTests: XCTestCase {
         assertThat(values, `is`(empty()))
         assertThat(terminated, `is`(0))
 
-        observable!.on(.value("X"))
-        assertThat(events, contains(.value("X")))
+        observable!.on(.next("X"))
+        assertThat(events, contains(.next("X")))
         assertThat(values, contains("X"))
         assertThat(terminated, `is`(0))
 
         observable = nil
-        assertThat(events, contains(.value("X"), .terminated))
+        assertThat(events, contains(.next("X"), .terminated))
         assertThat(values, contains("X"))
         assertThat(terminated, `is`(1))
     }
@@ -127,11 +127,11 @@ class ObservableTests: XCTestCase {
 
         observable!.map({ $0.count }).subscribe({ events.append($0) }).disposed(by: bag)
 
-        observable!.on(.value("123"))
-        assertThat(events, contains(.value(3)))
+        observable!.on(.next("123"))
+        assertThat(events, contains(.next(3)))
 
         observable = nil
-        assertThat(events, contains(.value(3), .terminated))
+        assertThat(events, contains(.next(3), .terminated))
     }
 
     func testVariable() {
@@ -141,10 +141,10 @@ class ObservableTests: XCTestCase {
         var events = [Event<String>]()
         variable.subscribe({ events.append($0) }).disposed(by: bag)
         // ensure that initial value is notified
-        assertThat(events, contains(.value("X")))
+        assertThat(events, contains(.next("X")))
 
         variable.value = "Y"
-        assertThat(events, contains(.value("X"), .value("Y")))
+        assertThat(events, contains(.next("X"), .next("Y")))
     }
 
     func testValue() {
@@ -154,19 +154,19 @@ class ObservableTests: XCTestCase {
         let value = Value<String>(source: observable!)
         assertThat(value.value, `is`(nilValue()))
 
-        observable!.on(.value("X"))
+        observable!.on(.next("X"))
         assertThat(value.value, presentAnd(`is`("X")))
 
         var events = [Event<String?>]()
         value.subscribe({ events.append($0) }).disposed(by: bag)
-        assertThat(events, contains(.value("X")))
+        assertThat(events, contains(.next("X")))
 
-        observable!.on(.value("Y"))
+        observable!.on(.next("Y"))
         assertThat(value.value, presentAnd(`is`("Y")))
-        assertThat(events, contains(.value("X"), .value("Y")))
+        assertThat(events, contains(.next("X"), .next("Y")))
 
         observable = nil
         assertThat(value.value, `is`(nilValue()))
-        assertThat(events, contains(.value("X"), .value("Y"), .terminated))
+        assertThat(events, contains(.next("X"), .next("Y"), .terminated))
    }
 }

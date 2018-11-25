@@ -24,7 +24,7 @@ public class Variable<T>: Observable<T> {
 
     public var value: T {
         didSet {
-            on(.value(value))
+            on(.next(value))
         }
     }
 
@@ -35,7 +35,7 @@ public class Variable<T>: Observable<T> {
 
     override public func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<T> {
         let result = super.subscribe(observer)
-        on(.value(value))
+        on(.next(value))
         return result
     }
 }
