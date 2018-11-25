@@ -26,6 +26,9 @@ public protocol Disposable: AnyObject {
 }
 
 extension Disposable {
+    /// Put a disposble on a dispose bag
+    ///
+    /// - Parameter disposeBag: dispoable to put in the dispose bag
     public func disposed(by disposeBag: DisposeBag) {
         disposeBag.add(disposable: self)
     }
@@ -39,12 +42,12 @@ public class DisposeBag {
     public init() {
     }
 
-    public func add(disposable: Disposable) {
+    fileprivate func add(disposable: Disposable) {
         disposables.append(disposable)
     }
 
+    /// Dispose all disposable in the bag
     public func dispose() {
         disposables.removeAll()
     }
 }
-

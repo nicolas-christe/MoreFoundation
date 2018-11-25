@@ -104,9 +104,9 @@
 			children = (
 				3763002F21A6D1E900B61F33 /* Disposable.swift */,
 				3763003621A6D2A000B61F33 /* Observable.swift */,
+				3763003B21A6D8DF00B61F33 /* Map.swift */,
 				3763003921A6D8B500B61F33 /* Variable.swift */,
 				3793335921A6E0F000014386 /* Value.swift */,
-				3763003B21A6D8DF00B61F33 /* Map.swift */,
 			);
 			path = MoreFoundation;
 			sourceTree = "<group>";
@@ -128,6 +128,7 @@
 			buildConfigurationList = 3763003321A6D1E900B61F33 /* Build configuration list for PBXNativeTarget "MoreFoundation" */;
 			buildPhases = (
 				3763002821A6D1E900B61F33 /* Sources */,
+				374E516021AA9E6C001ED3FD /* swiftlint */,
 				3763002921A6D1E900B61F33 /* Frameworks */,
 				3763002A21A6D1E900B61F33 /* CopyFiles */,
 			);
@@ -145,6 +146,7 @@
 			buildConfigurationList = 3793336721A6E25500014386 /* Build configuration list for PBXNativeTarget "MoreFoundationTests" */;
 			buildPhases = (
 				3793335B21A6E25500014386 /* Sources */,
+				374E515F21AA9D27001ED3FD /* swiftlint */,
 				3793335C21A6E25500014386 /* Frameworks */,
 				3793335D21A6E25500014386 /* Resources */,
 			);
@@ -203,6 +205,47 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		374E515F21AA9D27001ED3FD /* swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = swiftlint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint --path \"$SRCROOT/$TARGETNAME\"\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		374E516021AA9E6C001ED3FD /* swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = swiftlint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\necho \"$SRCROOT\"\nswiftlint --path \"$SRCROOT/$TARGETNAME\"\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3763002821A6D1E900B61F33 /* Sources */ = {

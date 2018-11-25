@@ -20,21 +20,22 @@
 
 import Foundation
 
-public class Value<T>: Observable<Optional<T>> {
+public class Value<T>: Observable<T?> {
 
     public private(set) var value: T?
 
-    private let source: Observable<T>
     private let disposeBag = DisposeBag()
 
     public init(source: Observable<T>) {
-        self.source = source
         super.init()
         source.subscribe { event in
             switch event {
             case .value(let value):
                 self.value = value
                 self.on(.value(value))
+            case .terminated:
+                self.value = nil
+                self.on(.terminated)
             }
         }.disposed(by: disposeBag)
     }

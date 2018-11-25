@@ -1,0 +1,100 @@
+disabled_rules:
+- nesting
+- function_parameter_count
+
+opt_in_rules:
+# Prefer using AnyObject over class for class-only protocols
+- anyobject_protocol
+
+#Prefer using Array(seq) over seq.map { $0 } to convert a sequence into an Array.
+- array_init
+
+# Closure expressions should have a single space inside each brace.
+- closure_spacing
+
+# All elements in a collection literal should be vertically aligned
+- collection_alignment
+
+# Prefer contains over first(where:) != nil
+- contains_over_first_not_nil
+
+# Types used for hosting only static members should be implemented as a caseless enum to avoid instantiation
+- convenience_type
+
+# Prefer checking isEmpty over comparing count to zero.
+- empty_count
+
+# Prefer checking isEmpty over comparing string to an empty string literal.
+- empty_string
+
+# Explicitly calling .init() should be avoided.
+- explicit_init
+
+# A fatalError call should have a message.
+- fatal_error_message
+
+# Prefer using .first(where:) over .filter { }.first in collections.
+- first_where
+
+# Comparing two identical operands is likely a mistake.
+- identical_operands
+
+# Prefer implicit returns in closures.
+- implicit_return
+
+# Discouraged explicit usage of the default separator.
+- joined_default_parameter
+
+# Array and dictionary literal end should have the same indentation as the line that started it.
+- literal_expression_end_indentation
+
+# Ensure definitions have a lower access control level than their enclosing parent
+- lower_acl_than_parent
+
+# Modifier order should be consistent.
+- modifier_order
+
+# Some overridden methods should always call super
+- overridden_super_call
+
+# Extensions shouldn't override declarations.
+- override_in_extension
+
+# Combine multiple pattern matching bindings by moving keywords out of tuples.
+- pattern_matching_keywords
+
+# IBActions should be private.
+- private_action
+
+# IBOutlets should be private to avoid leaking UIKit to higher layers.
+- private_outlet
+
+# Some methods should not call super
+- prohibited_super_call
+
+# nil coalescing operator is only evaluated if the lhs is nil, coalescing operator with nil as rhs is redundant
+- redundant_nil_coalescing
+
+# Prefer using min() or max() over sorted().first or sorted().last
+- sorted_first_last
+
+# Operators should be declared as static functions, not free functions.
+- static_operator
+
+# Prefer someBool.toggle() over someBool = !someBool.
+- toggle_bool
+
+# Parentheses are not needed when declaring closure arguments.
+- unneeded_parentheses_in_closure_argument
+
+# All imported modules should be required to make the file compile.
+- unused_import
+
+# Private declarations should be referenced in that file.
+- unused_private_declaration
+
+# Function parameters should be aligned vertically if they're in multiple lines in a declaration.
+- vertical_parameter_alignment_on_call
+
+# The variable should be placed on the left, the constant on the right of a comparison operator.
+- yoda_condition

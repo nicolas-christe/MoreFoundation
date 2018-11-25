@@ -22,7 +22,7 @@ import Foundation
 
 private class Map<T, U>: Observable<U> {
 
-    private let source: Observable<T>
+    private weak var source: Observable<T>?
     private let disposeBag = DisposeBag()
     private let transform: (T) -> U
 
@@ -31,14 +31,21 @@ private class Map<T, U>: Observable<U> {
         self.transform = transform
     }
 
-    public override func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<U> {
-        super.subscribe(observer).disposed(by: disposeBag)
-        return source.subscribe { event in
-            switch event {
-            case .value(let value):
-                self.on(.value(self.transform(value)))
-            }
+    override func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<U> {
+        let disposable = super.subscribe(observer)
+        if let source = source {
+            source.subscribe { event in
+                switch event {
+                case .value(let value):
+                    self.on(.value(self.transform(value)))
+                case .terminated:
+                    self.disposeBag.dispose()
+                }
+            }.disposed(by: disposeBag)
+        } else {
+            self.on(.terminated)
         }
+        return disposable
     }
 }
 

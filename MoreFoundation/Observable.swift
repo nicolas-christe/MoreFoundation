@@ -22,6 +22,7 @@ import Foundation
 
 public enum Event<T> {
     case value(T)
+    case terminated
 }
 
 extension Event: Equatable where T: Equatable {
@@ -30,6 +31,7 @@ extension Event: Equatable where T: Equatable {
 public enum EventHandler<T> {
     case onEvent((Event<T>) -> Void)
     case onValue((T) -> Void)
+    case onTerminated(() -> Void)
 }
 
 public protocol ObserverType: AnyObject {
@@ -47,6 +49,10 @@ public class Observable<T> {
     public init(willBeObserved: @escaping () -> Void = {}, wasObserved: @escaping () -> Void = {}) {
         self.willBeObserved = willBeObserved
         self.wasObserved = wasObserved
+    }
+
+    deinit {
+        on(.terminated)
     }
 
     public func subscribe<O: ObserverType> (_ observer: O) -> Disposable where O.EventType == Event<T> {
@@ -102,10 +108,13 @@ public class Observer<T>: ObserverType {
     public func on(_ event: Event<T>) {
         handlers.forEach {
             switch ($0, event) {
-            case (.onEvent(let eventHandler), _):
+            case let (.onEvent(eventHandler), _):
                 eventHandler(event)
-            case (.onValue(let valueHandler), .value(let value)):
+            case let (.onValue(valueHandler), .value(value)):
                 valueHandler(value)
+            case let (.onTerminated(terminatedHandler), .terminated):
+                terminatedHandler()
+            default: break
             }
         }
     }
