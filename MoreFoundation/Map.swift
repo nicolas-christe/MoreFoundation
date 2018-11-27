@@ -20,32 +20,17 @@
 
 import Foundation
 
-private class Map<T, U>: Observable<U> {
+private class Map<T, U>: Observable<T>.Proxy<U> {
 
-    private weak var source: Observable<T>?
-    private let disposeBag = DisposeBag()
     private let transform: (T) -> U
 
     init(source: Observable<T>, transform: @escaping (T) -> U) {
-        self.source = source
         self.transform = transform
+        super.init(source: source)
     }
 
-    override func subscribe(_ observer: Observer<U>) -> Disposable {
-        let disposable = super.subscribe(observer)
-        if let source = source {
-            source.subscribe { event in
-                switch event {
-                case .next(let value):
-                    self.onNext(self.transform(value))
-                case .terminated:
-                    self.disposeBag.dispose()
-                }
-            }.disposed(by: disposeBag)
-        } else {
-            self.onTerminated()
-        }
-        return disposable
+    override func process(next: T) {
+        self.onNext(self.transform(next))
     }
 }
 

@@ -20,34 +20,19 @@
 
 import Foundation
 
-private class Filter<T>: Observable<T> {
+private class Filter<T>: Observable<T>.Proxy<T> {
 
-    private weak var source: Observable<T>?
-    private let disposeBag = DisposeBag()
     private let isIncluded: (T) -> Bool
 
     init(source: Observable<T>, isIncluded: @escaping (T) -> Bool) {
-        self.source = source
         self.isIncluded = isIncluded
+        super.init(source: source)
     }
 
-    override func subscribe(_ observer: Observer<T>) -> Disposable {
-        let disposable = super.subscribe(observer)
-        if let source = source {
-            source.subscribe { event in
-                switch event {
-                case .next(let value):
-                    if self.isIncluded(value) {
-                        self.onNext(value)
-                    }
-                case .terminated:
-                    self.disposeBag.dispose()
-                }
-            }.disposed(by: disposeBag)
-        } else {
-            self.onTerminated()
+    override func process(next: T) {
+        if isIncluded(next) {
+            self.onNext(next)
         }
-        return disposable
     }
 }
 

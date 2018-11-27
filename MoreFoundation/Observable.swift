@@ -92,6 +92,37 @@ public class Observable<T> {
         }
     }
 
+    public class Proxy<U>: Observable<U> {
+
+        private weak var source: Observable<T>?
+        private let disposeBag = DisposeBag()
+
+        init(source: Observable<T>) {
+            self.source = source
+        }
+
+        override public func subscribe(_ observer: Observer<U>) -> Disposable {
+            let disposable = super.subscribe(observer)
+            if let source = source {
+                source.subscribe { event in
+                    switch event {
+                    case .next(let value):
+                        self.process(next: value)
+                    case .terminated:
+                        self.disposeBag.dispose()
+                    }
+                    }.disposed(by: disposeBag)
+            } else {
+                self.onTerminated()
+            }
+            return disposable
+        }
+
+        func process(next: T) {
+        }
+    }
+
+
     private class Registration: Disposable {
 
         private weak var observable: Observable<T>?
