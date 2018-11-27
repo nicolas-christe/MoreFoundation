@@ -25,7 +25,7 @@ import Hamcrest
 class ObservableTests: XCTestCase {
 
     /// Test `willBeObserved` and `wasObserved` callbacks
-    func testwillBeObservedWasObserved() {
+    func testWillBeObservedWasObserved() {
         let bag1 = DisposeBag()
         let bag2 = DisposeBag()
 
@@ -36,7 +36,7 @@ class ObservableTests: XCTestCase {
             willBeObserved: { willBeObservedCnt += 1},
             wasObserved: { wasObserved += 1})
 
-        observable.on(.next("1"))
+        observable.onNext("1")
         assertThat(willBeObservedCnt, `is`(0))
         assertThat(wasObserved, `is`(0))
 
@@ -57,6 +57,20 @@ class ObservableTests: XCTestCase {
         assertThat(wasObserved, `is`(1))
     }
 
+    /// Test `willBeObserved` and `wasObserved` callbacks
+    func testWasObservedOnTerminate() {
+        let bag = DisposeBag()
+
+        var wasObserved = 0
+        let observable = Observable<String>(
+            wasObserved: { wasObserved += 1})
+
+        observable.subscribe({ _ in}).disposed(by: bag)
+        observable.onTerminated()
+
+        assertThat(wasObserved, `is`(1))
+    }
+
     /// Test subcribe
     func testSubscribe() {
         let bag1 = DisposeBag()
@@ -69,35 +83,35 @@ class ObservableTests: XCTestCase {
 
         // check observer is notified
         observable.subscribe { events1.append($0) }.disposed(by: bag1)
-        observable.on(.next("X"))
+        observable.onNext("X")
         assertThat(events1, contains(.next("X")))
 
         // check 2nd observer is also notified
         observable.subscribe({events2.append($0)}).disposed(by: bag2)
-        observable.on(.next("Y"))
+        observable.onNext("Y")
         assertThat(events1, contains(.next("X"), .next("Y")))
         assertThat(events2, contains(.next("Y")))
 
         // check that unregisted observers are not notified
         bag1.dispose()
-        observable.on(.next("Z"))
+        observable.onNext("Z")
         assertThat(events1, contains(.next("X"), .next("Y")))
         assertThat(events2, contains(.next("Y"), .next("Z")))
 
-        // check terminated
+        // check observable is terminated on deinit
         observable = nil
         assertThat(events1, contains(.next("X"), .next("Y")))
         assertThat(events2, contains(.next("Y"), .next("Z"), .terminated))
     }
 
-    func testHandlers() {
+    func testSubscribeHandlers() {
         let bag = DisposeBag()
-        var observable: Observable<String>? = Observable()
+        let observable = Observable<String>()
         var events = [Event<String>]()
         var values = [String]()
         var terminated = 0
 
-        observable?.subscribe(
+        observable.subscribe(
             .onEvent { events.append($0) },
             .onNext { values.append($0) },
             .onTerminated { terminated += 1})
@@ -107,31 +121,75 @@ class ObservableTests: XCTestCase {
         assertThat(values, `is`(empty()))
         assertThat(terminated, `is`(0))
 
-        observable!.on(.next("X"))
+        observable.onNext("X")
         assertThat(events, contains(.next("X")))
         assertThat(values, contains("X"))
         assertThat(terminated, `is`(0))
 
-        observable = nil
+        observable.onTerminated()
         assertThat(events, contains(.next("X"), .terminated))
         assertThat(values, contains("X"))
         assertThat(terminated, `is`(1))
     }
 
+    func testSubscribeOnTerminatedObservable() {
+        let bag = DisposeBag()
+        let observable = Observable<String>()
+        var events = [Event<String>]()
+
+        observable.onTerminated()
+        observable.subscribe({events.append($0)}).disposed(by: bag)
+        assertThat(events, contains(.terminated))
+    }
+
+    func testOnNextOnTerminatedObservable() {
+        let expectation = self.expectation(description: "expectingFatal")
+        fatalInterceptor = { _ in
+            expectation.fulfill()
+            never()
+        }
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            let observable = Observable<String>()
+            observable.onTerminated()
+            observable.onNext("X")
+        }
+        waitForExpectations(timeout: 1)
+        fatalInterceptor = nil
+    }
+
     // test ".map()" function
     func testMap() {
         let bag = DisposeBag()
-        var observable: Observable<String>? = Observable()
+        let observable = Observable<String>()
 
         var events = [Event<Int>]()
 
-        observable!.map({ $0.count }).subscribe({ events.append($0) }).disposed(by: bag)
+        observable.map({ $0.count }).subscribe({ events.append($0) }).disposed(by: bag)
 
-        observable!.on(.next("123"))
+        observable.onNext("123")
         assertThat(events, contains(.next(3)))
 
-        observable = nil
+        observable.onTerminated()
         assertThat(events, contains(.next(3), .terminated))
+    }
+
+    func testFilter() {
+        let bag = DisposeBag()
+        let observable = Observable<String>()
+
+        var events = [Event<String>]()
+
+        observable.filter({ $0.count > 1 }).subscribe({ events.append($0) }).disposed(by: bag)
+
+        observable.onNext("XX")
+        assertThat(events, contains(.next("XX")))
+
+        observable.onNext("Y")
+        assertThat(events, contains(.next("XX")))
+
+        observable.onTerminated()
+        assertThat(events, contains(.next("XX"), .terminated))
     }
 
     func testVariable() {
@@ -149,23 +207,23 @@ class ObservableTests: XCTestCase {
 
     func testValue() {
         let bag = DisposeBag()
-        var observable: Observable<String>? = Observable()
+        let observable = Observable<String>()
 
-        let value = Value<String>(source: observable!)
+        let value = Value<String>(source: observable)
         assertThat(value.value, `is`(nilValue()))
 
-        observable!.on(.next("X"))
+        observable.onNext("X")
         assertThat(value.value, presentAnd(`is`("X")))
 
         var events = [Event<String?>]()
         value.subscribe({ events.append($0) }).disposed(by: bag)
         assertThat(events, contains(.next("X")))
 
-        observable!.on(.next("Y"))
+        observable.onNext("Y")
         assertThat(value.value, presentAnd(`is`("Y")))
         assertThat(events, contains(.next("X"), .next("Y")))
 
-        observable = nil
+        observable.onTerminated()
         assertThat(value.value, `is`(nilValue()))
         assertThat(events, contains(.next("X"), .next("Y"), .terminated))
    }

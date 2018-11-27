@@ -20,22 +20,39 @@
 
 import Foundation
 
-public class Variable<T>: Observable<T> {
+private class Filter<T>: Observable<T> {
 
-    public var value: T {
-        didSet {
-            onNext(value)
+    private weak var source: Observable<T>?
+    private let disposeBag = DisposeBag()
+    private let isIncluded: (T) -> Bool
+
+    init(source: Observable<T>, isIncluded: @escaping (T) -> Bool) {
+        self.source = source
+        self.isIncluded = isIncluded
+    }
+
+    override func subscribe(_ observer: Observer<T>) -> Disposable {
+        let disposable = super.subscribe(observer)
+        if let source = source {
+            source.subscribe { event in
+                switch event {
+                case .next(let value):
+                    if self.isIncluded(value) {
+                        self.onNext(value)
+                    }
+                case .terminated:
+                    self.disposeBag.dispose()
+                }
+            }.disposed(by: disposeBag)
+        } else {
+            self.onTerminated()
         }
+        return disposable
     }
+}
 
-    public init(value: T) {
-        self.value = value
-        super.init()
-    }
-
-    override public func subscribe(_ observer: Observer<T>) -> Disposable {
-        let result = super.subscribe(observer)
-        onNext(value)
-        return result
+public extension Observable {
+    public func filter(_ isIncluded: @escaping (T) -> Bool) -> Observable<T> {
+        return Filter(source: self, isIncluded: isIncluded)
     }
 }

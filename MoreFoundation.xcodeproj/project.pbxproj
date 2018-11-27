@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3741CA8B21A7022900A1FE96 /* Hamcrest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3741CA8A21A7022900A1FE96 /* Hamcrest.framework */; };
+		374E516221AAB041001ED3FD /* Fatal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374E516121AAB041001ED3FD /* Fatal.swift */; };
 		3763003021A6D1E900B61F33 /* Disposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763002F21A6D1E900B61F33 /* Disposable.swift */; };
 		3763003721A6D2A000B61F33 /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763003621A6D2A000B61F33 /* Observable.swift */; };
 		3763003A21A6D8B500B61F33 /* Variable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763003921A6D8B500B61F33 /* Variable.swift */; };
@@ -15,6 +16,7 @@
 		3793335A21A6E0F000014386 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793335921A6E0F000014386 /* Value.swift */; };
 		3793336221A6E25500014386 /* ObservableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793336121A6E25500014386 /* ObservableTests.swift */; };
 		3793336421A6E25500014386 /* libMoreFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3763002C21A6D1E900B61F33 /* libMoreFoundation.a */; };
+		37FC121621AD59120096F9C9 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC121521AD59120096F9C9 /* Filter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		3741CA8A21A7022900A1FE96 /* Hamcrest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Hamcrest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		374E516121AAB041001ED3FD /* Fatal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fatal.swift; sourceTree = "<group>"; };
 		3763002C21A6D1E900B61F33 /* libMoreFoundation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoreFoundation.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3763002F21A6D1E900B61F33 /* Disposable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disposable.swift; sourceTree = "<group>"; };
 		3763003621A6D2A000B61F33 /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
@@ -50,6 +53,7 @@
 		3793335F21A6E25500014386 /* MoreFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoreFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3793336121A6E25500014386 /* ObservableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableTests.swift; sourceTree = "<group>"; };
 		3793336321A6E25500014386 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37FC121521AD59120096F9C9 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,8 +109,10 @@
 				3763002F21A6D1E900B61F33 /* Disposable.swift */,
 				3763003621A6D2A000B61F33 /* Observable.swift */,
 				3763003B21A6D8DF00B61F33 /* Map.swift */,
+				37FC121521AD59120096F9C9 /* Filter.swift */,
 				3763003921A6D8B500B61F33 /* Variable.swift */,
 				3793335921A6E0F000014386 /* Value.swift */,
+				374E516121AAB041001ED3FD /* Fatal.swift */,
 			);
 			path = MoreFoundation;
 			sourceTree = "<group>";
@@ -252,9 +258,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37FC121621AD59120096F9C9 /* Filter.swift in Sources */,
 				3763003721A6D2A000B61F33 /* Observable.swift in Sources */,
 				3763003A21A6D8B500B61F33 /* Variable.swift in Sources */,
 				3793335A21A6E0F000014386 /* Value.swift in Sources */,
+				374E516221AAB041001ED3FD /* Fatal.swift in Sources */,
 				3763003C21A6D8DF00B61F33 /* Map.swift in Sources */,
 				3763003021A6D1E900B61F33 /* Disposable.swift in Sources */,
 			);

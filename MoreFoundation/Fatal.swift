@@ -20,22 +20,18 @@
 
 import Foundation
 
-public class Variable<T>: Observable<T> {
+public var fatalInterceptor: ((_ message: String?) -> Never)?
 
-    public var value: T {
-        didSet {
-            onNext(value)
+public func fatal(_ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line)
+    -> Never {
+        if let fatalInterceptor = fatalInterceptor {
+            fatalInterceptor(message())
         }
-    }
+        fatalError(message, file: file, line: line)
+}
 
-    public init(value: T) {
-        self.value = value
-        super.init()
-    }
-
-    override public func subscribe(_ observer: Observer<T>) -> Disposable {
-        let result = super.subscribe(observer)
-        onNext(value)
-        return result
-    }
+public func never() -> Never {
+    repeat {
+        RunLoop.current.run()
+    } while (true)
 }

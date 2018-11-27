@@ -36,10 +36,11 @@ public enum EventHandler<T> {
 
 public class Observable<T> {
 
-    private var observers = [ObjectIdentifier: Observer<T>]()
-
     private let willBeObserved: () -> Void
     private let wasObserved: () -> Void
+
+    private var observers = [ObjectIdentifier: Observer<T>]()
+    public private(set) var terminated = false
 
     public init(willBeObserved: @escaping () -> Void = {}, wasObserved: @escaping () -> Void = {}) {
         self.willBeObserved = willBeObserved
@@ -47,10 +48,14 @@ public class Observable<T> {
     }
 
     deinit {
-        on(.terminated)
+        onTerminated()
     }
 
     public func subscribe(_ observer: Observer<T>) -> Disposable {
+        guard !terminated else {
+            observer.on(.terminated)
+            return DummyDisposable()
+        }
         if observers.isEmpty {
             willBeObserved()
         }
@@ -59,7 +64,22 @@ public class Observable<T> {
         return Registration(observable: self, identifier: identifier)
     }
 
-    public func on(_ event: Event<T>) {
+    public func onNext(_ value: T) {
+        guard !terminated else {
+            fatal("onNext called on a terminated observable")
+        }
+        self.on(.next(value))
+    }
+
+    public func onTerminated() {
+        terminated = true
+        self.on(.terminated)
+        if observers.count > 0 {
+            observers.removeAll()
+            wasObserved()
+        }
+    }
+    private func on(_ event: Event<T>) {
         observers.values.forEach {
             $0.on(event)
         }
@@ -86,6 +106,8 @@ public class Observable<T> {
             observable?.unsubscribe(identifier)
         }
     }
+
+    private class DummyDisposable: Disposable {}
 }
 
 public class Observer<T> {

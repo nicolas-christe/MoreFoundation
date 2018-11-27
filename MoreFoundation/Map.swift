@@ -37,13 +37,13 @@ private class Map<T, U>: Observable<U> {
             source.subscribe { event in
                 switch event {
                 case .next(let value):
-                    self.on(.next(self.transform(value)))
+                    self.onNext(self.transform(value))
                 case .terminated:
                     self.disposeBag.dispose()
                 }
             }.disposed(by: disposeBag)
         } else {
-            self.on(.terminated)
+            self.onTerminated()
         }
         return disposable
     }
