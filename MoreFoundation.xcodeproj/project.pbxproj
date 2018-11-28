@@ -13,9 +13,12 @@
 		3763003721A6D2A000B61F33 /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763003621A6D2A000B61F33 /* Observable.swift */; };
 		3763003A21A6D8B500B61F33 /* Variable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763003921A6D8B500B61F33 /* Variable.swift */; };
 		3763003C21A6D8DF00B61F33 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763003B21A6D8DF00B61F33 /* Map.swift */; };
+		376443AB21ADDA9C0092BCE8 /* ContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */; };
+		376443AD21AE70A40092BCE8 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 376443AC21AE70A40092BCE8 /* .swiftlint.yml */; };
 		3793335A21A6E0F000014386 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793335921A6E0F000014386 /* Value.swift */; };
 		3793336221A6E25500014386 /* ObservableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793336121A6E25500014386 /* ObservableTests.swift */; };
 		3793336421A6E25500014386 /* libMoreFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3763002C21A6D1E900B61F33 /* libMoreFoundation.a */; };
+		37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFBB0F21AD7A13003DC9C9 /* Container.swift */; };
 		37FC121621AD59120096F9C9 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC121521AD59120096F9C9 /* Filter.swift */; };
 /* End PBXBuildFile section */
 
@@ -49,10 +52,13 @@
 		3763003621A6D2A000B61F33 /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
 		3763003921A6D8B500B61F33 /* Variable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variable.swift; sourceTree = "<group>"; };
 		3763003B21A6D8DF00B61F33 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
+		376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerTests.swift; sourceTree = "<group>"; };
+		376443AC21AE70A40092BCE8 /* .swiftlint.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .swiftlint.yml; sourceTree = "<group>"; };
 		3793335921A6E0F000014386 /* Value.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
 		3793335F21A6E25500014386 /* MoreFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoreFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3793336121A6E25500014386 /* ObservableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableTests.swift; sourceTree = "<group>"; };
 		3793336321A6E25500014386 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37CFBB0F21AD7A13003DC9C9 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		37FC121521AD59120096F9C9 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -87,6 +93,7 @@
 		3763002321A6D1E900B61F33 = {
 			isa = PBXGroup;
 			children = (
+				376443AC21AE70A40092BCE8 /* .swiftlint.yml */,
 				3763002E21A6D1E900B61F33 /* MoreFoundation */,
 				3793336021A6E25500014386 /* MoreFoundationTests */,
 				3763002D21A6D1E900B61F33 /* Products */,
@@ -107,20 +114,30 @@
 			isa = PBXGroup;
 			children = (
 				3763002F21A6D1E900B61F33 /* Disposable.swift */,
+				376443AE21AE70FA0092BCE8 /* Observable */,
+				374E516121AAB041001ED3FD /* Fatal.swift */,
+				37CFBB0F21AD7A13003DC9C9 /* Container.swift */,
+			);
+			path = MoreFoundation;
+			sourceTree = "<group>";
+		};
+		376443AE21AE70FA0092BCE8 /* Observable */ = {
+			isa = PBXGroup;
+			children = (
 				3763003621A6D2A000B61F33 /* Observable.swift */,
 				3763003B21A6D8DF00B61F33 /* Map.swift */,
 				37FC121521AD59120096F9C9 /* Filter.swift */,
 				3763003921A6D8B500B61F33 /* Variable.swift */,
 				3793335921A6E0F000014386 /* Value.swift */,
-				374E516121AAB041001ED3FD /* Fatal.swift */,
 			);
-			path = MoreFoundation;
+			path = Observable;
 			sourceTree = "<group>";
 		};
 		3793336021A6E25500014386 /* MoreFoundationTests */ = {
 			isa = PBXGroup;
 			children = (
 				3793336121A6E25500014386 /* ObservableTests.swift */,
+				376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */,
 				3793336321A6E25500014386 /* Info.plist */,
 			);
 			path = MoreFoundationTests;
@@ -207,6 +224,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				376443AD21AE70A40092BCE8 /* .swiftlint.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +281,7 @@
 				3763003A21A6D8B500B61F33 /* Variable.swift in Sources */,
 				3793335A21A6E0F000014386 /* Value.swift in Sources */,
 				374E516221AAB041001ED3FD /* Fatal.swift in Sources */,
+				37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */,
 				3763003C21A6D8DF00B61F33 /* Map.swift in Sources */,
 				3763003021A6D1E900B61F33 /* Disposable.swift in Sources */,
 			);
@@ -273,6 +292,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3793336221A6E25500014386 /* ObservableTests.swift in Sources */,
+				376443AB21ADDA9C0092BCE8 /* ContainerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,7 +358,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -393,7 +413,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

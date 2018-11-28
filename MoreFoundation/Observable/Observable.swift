@@ -28,12 +28,6 @@ public enum Event<T> {
 extension Event: Equatable where T: Equatable {
 }
 
-public enum EventHandler<T> {
-    case onEvent((Event<T>) -> Void)
-    case onNext((T) -> Void)
-    case onTerminated(() -> Void)
-}
-
 public class Observable<T> {
 
     private let willBeObserved: () -> Void
@@ -122,7 +116,6 @@ public class Observable<T> {
         }
     }
 
-
     private class Registration: Disposable {
 
         private weak var observable: Observable<T>?
@@ -143,13 +136,19 @@ public class Observable<T> {
 
 public class Observer<T> {
 
-    private let handlers: [EventHandler<T>]
+    public enum EventHandler {
+        case onEvent((Event<T>) -> Void)
+        case onNext((T) -> Void)
+        case onTerminated(() -> Void)
+    }
 
-    public init(_ handlers: [EventHandler<T>]) {
+    private let handlers: [EventHandler]
+
+    public init(_ handlers: [EventHandler]) {
         self.handlers = handlers
     }
 
-    public convenience init(_ handlers: EventHandler<T>...) {
+    public convenience init(_ handlers: EventHandler...) {
         self.init(handlers)
     }
 
@@ -170,7 +169,7 @@ public class Observer<T> {
 
 public extension Observable {
 
-    public func subscribe(_ handlers: EventHandler<T>...) -> Disposable {
+    public func subscribe(_ handlers: Observer<T>.EventHandler...) -> Disposable {
         return subscribe(Observer(handlers))
     }
 
