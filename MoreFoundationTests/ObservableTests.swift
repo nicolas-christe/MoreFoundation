@@ -194,15 +194,27 @@ class ObservableTests: XCTestCase {
 
     func testVariable() {
         let bag = DisposeBag()
-        let variable = Variable<String>(value: "X")
+        let variable = Variable<String>("X")
 
         var events = [Event<String>]()
         variable.subscribe({ events.append($0) }).disposed(by: bag)
         // ensure that initial value is notified
         assertThat(events, contains(.next("X")))
 
-        variable.value = "Y"
+        variable.onNext("Y")
         assertThat(events, contains(.next("X"), .next("Y")))
+    }
+
+    func testVariableNoInitialValue() {
+        let bag = DisposeBag()
+        let variable = Variable<String>()
+
+        var events = [Event<String>]()
+        variable.subscribe({ events.append($0) }).disposed(by: bag)
+        assertThat(events, empty())
+
+        variable.onNext("X")
+        assertThat(events, contains(.next("X")))
     }
 
     func testValue() {

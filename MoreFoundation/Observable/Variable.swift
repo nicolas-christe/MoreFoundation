@@ -22,20 +22,27 @@ import Foundation
 
 public class Variable<T>: Observable<T> {
 
-    public var value: T {
-        didSet {
-            onNext(value)
-        }
+    private var value: T?
+
+    public init() {
+        super.init()
     }
 
-    public init(value: T) {
+    public init(_ value: T) {
         self.value = value
         super.init()
     }
 
+    public override func onNext(_ value: T) {
+        self.value = value
+        super.onNext(value)
+    }
+
     override public func subscribe(_ observer: Observer<T>) -> Disposable {
         let result = super.subscribe(observer)
-        onNext(value)
+        if let value = value {
+            onNext(value)
+        }
         return result
     }
 }
