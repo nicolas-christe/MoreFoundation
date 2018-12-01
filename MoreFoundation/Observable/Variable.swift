@@ -22,7 +22,7 @@ import Foundation
 
 public class Variable<T>: Observable<T> {
 
-    private var value: T?
+    public private (set) var value: T?
 
     public init() {
         super.init()
@@ -31,6 +31,10 @@ public class Variable<T>: Observable<T> {
     public init(_ value: T) {
         self.value = value
         super.init()
+    }
+
+    public func set(_ newValue: T) {
+        onNext(newValue)
     }
 
     public override func onNext(_ value: T) {
