@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		372D5CB121B3E07500AE1202 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372D5CB021B3E07500AE1202 /* EventStore.swift */; };
 		3741CA8B21A7022900A1FE96 /* Hamcrest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3741CA8A21A7022900A1FE96 /* Hamcrest.framework */; };
 		374E516221AAB041001ED3FD /* Fatal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374E516121AAB041001ED3FD /* Fatal.swift */; };
 		3763003021A6D1E900B61F33 /* Disposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763002F21A6D1E900B61F33 /* Disposable.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		372D5CB021B3E07500AE1202 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
 		3741CA8A21A7022900A1FE96 /* Hamcrest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Hamcrest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		374E516121AAB041001ED3FD /* Fatal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fatal.swift; sourceTree = "<group>"; };
 		3763002C21A6D1E900B61F33 /* libMoreFoundation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoreFoundation.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -129,6 +131,7 @@
 				37FC121521AD59120096F9C9 /* Filter.swift */,
 				3763003921A6D8B500B61F33 /* Variable.swift */,
 				3793335921A6E0F000014386 /* Value.swift */,
+				372D5CB021B3E07500AE1202 /* EventStore.swift */,
 			);
 			path = Observable;
 			sourceTree = "<group>";
@@ -282,6 +285,7 @@
 				3793335A21A6E0F000014386 /* Value.swift in Sources */,
 				374E516221AAB041001ED3FD /* Fatal.swift in Sources */,
 				37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */,
+				372D5CB121B3E07500AE1202 /* EventStore.swift in Sources */,
 				3763003C21A6D8DF00B61F33 /* Map.swift in Sources */,
 				3763003021A6D1E900B61F33 /* Disposable.swift in Sources */,
 			);

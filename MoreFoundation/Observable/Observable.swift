@@ -23,6 +23,14 @@ import Foundation
 public enum Event<T> {
     case next(T)
     case terminated
+
+    /// `.next` event value, nil if event is not `.next`
+    public var value: T? {
+        if case let .next(value) = self {
+            return value
+        }
+        return nil
+    }
 }
 
 extension Event: Equatable where T: Equatable {

@@ -239,4 +239,21 @@ class ObservableTests: XCTestCase {
         assertThat(value.value, `is`(nilValue()))
         assertThat(events, contains(.next("X"), .next("Y"), .terminated))
    }
+
+    func testEventStore() {
+        let observable = Observable<String>()
+        let store = observable.subscribeStore()
+
+        assertThat(store.pop(), `is`(nilValue()))
+
+        observable.onNext("X")
+        assertThat(store.pop()?.value, presentAnd(`is`("X")))
+
+        observable.onNext("Y")
+        assertThat(store.pop()?.value, presentAnd(`is`("Y")))
+
+        observable.onTerminated()
+        let event = store.pop()
+        assertThat(event, `is`(.terminated))
+    }
 }
