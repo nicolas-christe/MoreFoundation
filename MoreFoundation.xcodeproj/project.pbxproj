@@ -16,11 +16,11 @@
 		3763003C21A6D8DF00B61F33 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763003B21A6D8DF00B61F33 /* Map.swift */; };
 		376443AB21ADDA9C0092BCE8 /* ContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */; };
 		376443AD21AE70A40092BCE8 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 376443AC21AE70A40092BCE8 /* .swiftlint.yml */; };
+		378FA15A21B5B25F00140E04 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC121521AD59120096F9C9 /* Filter.swift */; };
 		3793335A21A6E0F000014386 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793335921A6E0F000014386 /* Value.swift */; };
 		3793336221A6E25500014386 /* ObservableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793336121A6E25500014386 /* ObservableTests.swift */; };
 		3793336421A6E25500014386 /* libMoreFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3763002C21A6D1E900B61F33 /* libMoreFoundation.a */; };
 		37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFBB0F21AD7A13003DC9C9 /* Container.swift */; };
-		37FC121621AD59120096F9C9 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC121521AD59120096F9C9 /* Filter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -279,7 +279,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37FC121621AD59120096F9C9 /* Filter.swift in Sources */,
 				3763003721A6D2A000B61F33 /* Observable.swift in Sources */,
 				3763003A21A6D8B500B61F33 /* Variable.swift in Sources */,
 				3793335A21A6E0F000014386 /* Value.swift in Sources */,
@@ -287,6 +286,7 @@
 				37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */,
 				372D5CB121B3E07500AE1202 /* EventStore.swift in Sources */,
 				3763003C21A6D8DF00B61F33 /* Map.swift in Sources */,
+				378FA15A21B5B25F00140E04 /* Filter.swift in Sources */,
 				3763003021A6D1E900B61F33 /* Disposable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -20,22 +20,14 @@
 
 import Foundation
 
-private class Map<T, U>: Observable<T>.Proxy<U> {
-
-    private let transform: (T) -> U
-
-    init(source: Observable<T>, transform: @escaping (T) -> U) {
-        self.transform = transform
-        super.init(source: source)
-    }
-
-    override func process(next: T) {
-        self.onNext(self.transform(next))
-    }
-}
-
 public extension Observable {
+
     public func map<U>(_ transform: @escaping (T) -> U) -> Observable<U> {
-        return Map(source: self, transform: transform)
+        return Observable.SimpleProxy(source: self, processCb: { event in
+            switch event {
+            case .next(let value): return .next(transform(value))
+            case .terminated: return .terminated
+            }
+        })
     }
 }

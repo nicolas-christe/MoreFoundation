@@ -20,24 +20,14 @@
 
 import Foundation
 
-private class Filter<T>: Observable<T>.Proxy<T> {
-
-    private let isIncluded: (T) -> Bool
-
-    init(source: Observable<T>, isIncluded: @escaping (T) -> Bool) {
-        self.isIncluded = isIncluded
-        super.init(source: source)
-    }
-
-    override func process(next: T) {
-        if isIncluded(next) {
-            self.onNext(next)
-        }
-    }
-}
-
 public extension Observable {
+
     public func filter(_ isIncluded: @escaping (T) -> Bool) -> Observable<T> {
-        return Filter(source: self, isIncluded: isIncluded)
+        return Observable.SimpleProxy(source: self, processCb: { event in
+            if case let .next(value) = event, !isIncluded(value) {
+                return nil
+            }
+            return event
+        })
     }
 }

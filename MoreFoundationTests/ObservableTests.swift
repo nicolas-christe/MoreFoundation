@@ -57,20 +57,6 @@ class ObservableTests: XCTestCase {
         assertThat(wasObserved, `is`(1))
     }
 
-    /// Test `willBeObserved` and `wasObserved` callbacks
-    func testWasObservedOnTerminate() {
-        let bag = DisposeBag()
-
-        var wasObserved = 0
-        let observable = Observable<String>(
-            wasObserved: { wasObserved += 1})
-
-        observable.subscribe({ _ in}).disposed(by: bag)
-        observable.onTerminated()
-
-        assertThat(wasObserved, `is`(1))
-    }
-
     /// Test subcribe
     func testSubscribe() {
         let bag1 = DisposeBag()
@@ -158,6 +144,30 @@ class ObservableTests: XCTestCase {
         fatalInterceptor = nil
     }
 
+    func testObservableProxy() {
+        let bag = DisposeBag()
+        var events1 = [Event<String>]()
+        var events2 = [Event<String>]()
+
+        let observable = Observable<String>()
+        let observableProxy = Observable.SimpleProxy<String>(source: observable, processCb: { return $0 })
+
+        observableProxy.subscribe({ events1.append($0) }).disposed(by: bag)
+
+        observable.onNext("X")
+        assertThat(events1, contains(.next("X")))
+
+        observableProxy.subscribe({ events2.append($0) }).disposed(by: bag)
+
+        observable.onNext("Y")
+        assertThat(events1, contains(.next("X"), .next("Y")))
+        assertThat(events2, contains(.next("Y")))
+
+        observable.onTerminated()
+        assertThat(events1, contains(.next("X"), .next("Y"), .terminated))
+        assertThat(events2, contains(.next("Y"), .terminated))
+    }
+
     // test ".map()" function
     func testMap() {
         let bag = DisposeBag()
@@ -227,7 +237,7 @@ class ObservableTests: XCTestCase {
         observable.onNext("X")
         assertThat(value.value, presentAnd(`is`("X")))
 
-        var events = [Event<String?>]()
+        var events = [Event<String>]()
         value.subscribe({ events.append($0) }).disposed(by: bag)
         assertThat(events, contains(.next("X")))
 

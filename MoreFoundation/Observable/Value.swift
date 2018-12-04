@@ -20,15 +20,15 @@
 
 import Foundation
 
-public class Value<T>: Observable<T?> {
+public class Value<T>: Observable<T> {
 
     public private(set) var value: T?
 
-    private let disposeBag = DisposeBag()
+    private var sourceSubscription: Disposable!
 
     public init(source: Observable<T>) {
         super.init()
-        source.subscribe { event in
+        sourceSubscription = source.subscribe { event in
             switch event {
             case .next(let value):
                 self.value = value
@@ -37,12 +37,12 @@ public class Value<T>: Observable<T?> {
                 self.value = nil
                 self.onTerminated()
             }
-        }.disposed(by: disposeBag)
+        }
     }
 
-    override public func subscribe(_ observer: Observer<T?>) -> Disposable {
+    override public func subscribe(_ observer: Observer<T>) -> Disposable {
         let result = super.subscribe(observer)
-        if value != nil {
+        if let value = value {
             onNext(value)
         }
         return result
