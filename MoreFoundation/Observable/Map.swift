@@ -22,6 +22,10 @@ import Foundation
 
 public extension Observable {
 
+    /// Convert an Observable<T> to Observable<U>
+    ///
+    /// - Parameter transform: function to transform `T` to `U`
+    /// - Returns: a new obsevable
     public func map<U>(_ transform: @escaping (T) -> U) -> Observable<U> {
         return Observable.SimpleProxy(source: self, processCb: { event in
             switch event {

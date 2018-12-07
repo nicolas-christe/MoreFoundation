@@ -248,7 +248,21 @@ class ObservableTests: XCTestCase {
         observable.onTerminated()
         assertThat(value.value, `is`(nilValue()))
         assertThat(events, contains(.next("X"), .next("Y"), .terminated))
-   }
+    }
+
+    func testValueMapVariable() {
+        let variable = Variable("X")
+        let value = Value(source: variable.map { return $0+"X" })
+        assertThat(value.value, presentAnd(`is`("XX")))
+    }
+
+    func testValueOnValue() {
+        let variable = Variable("X")
+        let value1 = Value(source: variable.map { return $0+"X" })
+        let value2 = Value(source: value1.map { return $0+"X" })
+        assertThat(value1.value, presentAnd(`is`("XX")))
+        assertThat(value2.value, presentAnd(`is`("XXX")))
+    }
 
     func testEventStore() {
         let observable = Observable<String>()

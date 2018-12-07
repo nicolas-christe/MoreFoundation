@@ -40,6 +40,11 @@ public enum Event<T> {
 extension Event: Equatable where T: Equatable {
 }
 
+public protocol ObservableType {
+    associatedtype DataType
+    func subscribe(_ observer: Observer<DataType>) -> Disposable
+}
+
 /// An Observable that generate a sequence of `Event<T>`.
 public class Observable<T> {
 
@@ -215,7 +220,7 @@ extension Observable {
         /// Proxy source
         private let source: Observable<T>
         /// Proxy source subscription
-        private var sourceSubscription: Disposable?
+//        private var sourceSubscription: Disposable?
 
         /// Constructor
         ///
@@ -224,17 +229,25 @@ extension Observable {
             self.source = source
         }
 
-        override func willBeObserved() {
-            sourceSubscription = source.subscribe {
+//        override func willBeObserved() {
+//            sourceSubscription = source.subscribe {
+//                if let event = self.process(event: $0) {
+//                    self.on(event)
+//                }
+//            }
+//        }
+
+        public override func subscribe(_ observer: Observer<U>) -> Disposable {
+            return source.subscribe {
                 if let event = self.process(event: $0) {
-                    self.on(event)
+                    observer.on(event)
                 }
             }
         }
 
-        override func wasObserved() {
-            sourceSubscription = nil
-        }
+//        override func wasObserved() {
+//            sourceSubscription = nil
+//        }
 
         /// Process event
         ///

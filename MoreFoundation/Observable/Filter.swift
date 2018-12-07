@@ -22,6 +22,10 @@ import Foundation
 
 public extension Observable {
 
+    /// Filter some `.next` events
+    ///
+    /// - Parameter isIncluded: function called to check if `.next` data must be included
+    /// - Returns: a new obsevable
     public func filter(_ isIncluded: @escaping (T) -> Bool) -> Observable<T> {
         return Observable.SimpleProxy(source: self, processCb: { event in
             if case let .next(value) = event, !isIncluded(value) {
