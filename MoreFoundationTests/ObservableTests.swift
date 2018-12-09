@@ -144,30 +144,6 @@ class ObservableTests: XCTestCase {
         fatalInterceptor = nil
     }
 
-    func testObservableProxy() {
-        let bag = DisposeBag()
-        var events1 = [Event<String>]()
-        var events2 = [Event<String>]()
-
-        let observable = Observable<String>()
-        let observableProxy = Observable.SimpleProxy<String>(source: observable, processCb: { return $0 })
-
-        observableProxy.subscribe({ events1.append($0) }).disposed(by: bag)
-
-        observable.onNext("X")
-        assertThat(events1, contains(.next("X")))
-
-        observableProxy.subscribe({ events2.append($0) }).disposed(by: bag)
-
-        observable.onNext("Y")
-        assertThat(events1, contains(.next("X"), .next("Y")))
-        assertThat(events2, contains(.next("Y")))
-
-        observable.onTerminated()
-        assertThat(events1, contains(.next("X"), .next("Y"), .terminated))
-        assertThat(events2, contains(.next("Y"), .terminated))
-    }
-
     // test ".map()" function
     func testMap() {
         let bag = DisposeBag()
@@ -252,7 +228,7 @@ class ObservableTests: XCTestCase {
 
     func testValueMapVariable() {
         let variable = Variable("X")
-        let value = Value(source: variable.map { return $0+"X" })
+        let value = Value<String>(source: variable.map { return $0+"X" })
         assertThat(value.value, presentAnd(`is`("XX")))
     }
 

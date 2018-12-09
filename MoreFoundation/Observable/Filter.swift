@@ -20,18 +20,33 @@
 
 import Foundation
 
-public extension Observable {
+private class Filter<T>: ObservableType<T> {
+
+    private let source: ObservableType<T>
+    private let isIncluded: (T) -> Bool
+
+    public init(source: ObservableType<T>, isIncluded: @escaping (T) -> Bool) {
+        self.source = source
+        self.isIncluded = isIncluded
+    }
+
+    override func subscribe(_ observer: Observer<T>) -> Disposable {
+        return source.subscribe { event in
+            if case let .next(value) = event, !self.isIncluded(value) {
+            } else {
+                observer.on(event)
+            }
+        }
+    }
+}
+
+public extension ObservableType {
 
     /// Filter some `.next` events
     ///
     /// - Parameter isIncluded: function called to check if `.next` data must be included
     /// - Returns: a new obsevable
-    public func filter(_ isIncluded: @escaping (T) -> Bool) -> Observable<T> {
-        return Observable.SimpleProxy(source: self, processCb: { event in
-            if case let .next(value) = event, !isIncluded(value) {
-                return nil
-            }
-            return event
-        })
+    public func filter(_ isIncluded: @escaping (T) -> Bool) -> ObservableType<T> {
+        return Filter(source: self, isIncluded: isIncluded)
     }
 }
