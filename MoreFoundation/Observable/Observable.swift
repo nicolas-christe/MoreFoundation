@@ -40,42 +40,18 @@ public enum Event<T> {
 extension Event: Equatable where T: Equatable {
 }
 
-/// An Observable that generate a sequence of `Event<T>`.
-public class Observable<T> {
+/// Base observable type
+public class ObservableType<T> {
 
-    /// Callback called when the first observer is about to subscribe.
-    private let willBeObservedCb: () -> Void
-    /// Callback called when the last observer did unsubscribe.
-    private let wasObservedCb: () -> Void
-
-    /// Map of obervers.
-    private var observers = [ObjectIdentifier: Observer<T>]()
     /// True if the observabe is terminated and will not produce more events.
     public private(set) var terminated = false
-
-    public init(willBeObserved: @escaping () -> Void = {}, wasObserved: @escaping () -> Void = {}) {
-        self.willBeObservedCb = willBeObserved
-        self.wasObservedCb = wasObserved
-    }
-
-    deinit {
-        onTerminated()
-    }
 
     /// Subscribe to observable events.
     ///
     /// - Parameter observer: observer to subscribe.
     /// - Returns: Disposable. Observer is subscribed until this disposable is deleted.
-    public func subscribe(_ observer: Observer<T>) -> Disposable {
-        if observers.isEmpty {
-            willBeObserved()
-        }
-        let identifier = ObjectIdentifier(observer)
-        observers[identifier] = observer
-        if terminated {
-            observer.on(.terminated)
-        }
-        return Registration(observable: self, identifier: identifier)
+    func subscribe(_ observer: Observer<T>) -> Disposable {
+        fatal("Must be overriden")
     }
 
     /// Send `.next` event to all observers.
@@ -95,56 +71,11 @@ public class Observable<T> {
         self.on(.terminated)
     }
 
-    /// Called when the first observer is about to subscribe
-    private func willBeObserved() {
-        self.willBeObservedCb()
-    }
-
-    /// Called when the last observer did unsubscribe
-    private func wasObserved() {
-        self.wasObservedCb()
-    }
-
     /// Process events.
     ///
     /// - Parameter event: event to send to observers.
-    private func on(_ event: Event<T>) {
-        observers.values.forEach {
-            $0.on(event)
-        }
-    }
-
-    /// Unsubsribe an observer
-    ///
-    /// - Parameter identifier: observer identifier.
-    private func unsubscribe(_ identifier: ObjectIdentifier) {
-        observers[identifier] = nil
-        if observers.isEmpty {
-            wasObserved()
-        }
-    }
-
-    /// An observer registration
-    private class Registration: Disposable {
-
-        /// Observabe the observer registred to
-        private weak var observable: Observable<T>?
-        /// Observer identifier
-        private let identifier: ObjectIdentifier
-
-        /// Constructor
-        ///
-        /// - Parameters:
-        ///   - observable: observabe the observer registred to
-        ///   - identifier: observer identifier
-        init(observable: Observable<T>, identifier: ObjectIdentifier) {
-            self.observable = observable
-            self.identifier = identifier
-        }
-
-        deinit {
-            observable?.unsubscribe(identifier)
-        }
+    fileprivate func on(_ event: Event<T>) {
+        fatal("Must be overriden")
     }
 }
 
@@ -181,7 +112,7 @@ public class Observer<T> {
     /// Process event
     ///
     /// - Parameter event: event to process
-    fileprivate func on(_ event: Event<T>) {
+    func on(_ event: Event<T>) {
         handlers.forEach {
             switch ($0, event) {
             case let (.onEvent(eventHandler), _):
@@ -197,7 +128,7 @@ public class Observer<T> {
 }
 
 // Add convenience subscribe
-public extension Observable {
+public extension ObservableType {
 
     public func subscribe(_ handlers: Observer<T>.EventHandler...) -> Disposable {
         return subscribe(Observer(handlers))
@@ -208,61 +139,91 @@ public extension Observable {
     }
 }
 
-extension Observable {
-    /// An observable proxy that forward subscription....
-    public class Proxy<U>: Observable<U> {
+/// An Observable that generate a sequence of `Event<T>`.
+public class Observable<T>: ObservableType<T> {
 
-        /// Proxy source
-        private let source: Observable<T>
-        /// Proxy source subscription
-        private var sourceSubscription: Disposable?
+    /// Callback called when the first observer is about to subscribe.
+    private let willBeObservedCb: () -> Void
+    /// Callback called when the last observer did unsubscribe.
+    private let wasObservedCb: () -> Void
 
-        /// Constructor
-        ///
-        /// - Parameter source: proxy source
-        public init(source: Observable<T>) {
-            self.source = source
+    /// Map of obervers.
+    private var observers = [ObjectIdentifier: Observer<T>]()
+
+    public init(willBeObserved: @escaping () -> Void = {}, wasObserved: @escaping () -> Void = {}) {
+        self.willBeObservedCb = willBeObserved
+        self.wasObservedCb = wasObserved
+    }
+
+    deinit {
+        onTerminated()
+    }
+
+    /// Subscribe to observable events.
+    ///
+    /// - Parameter observer: observer to subscribe.
+    /// - Returns: Disposable. Observer is subscribed until this disposable is deleted.
+    public override func subscribe(_ observer: Observer<T>) -> Disposable {
+        if observers.isEmpty {
+            willBeObserved()
         }
-
-        override func willBeObserved() {
-            sourceSubscription = source.subscribe {
-                if let event = self.process(event: $0) {
-                    self.on(event)
-                }
-            }
+        let identifier = ObjectIdentifier(observer)
+        observers[identifier] = observer
+        if terminated {
+            observer.on(.terminated)
         }
+        return Registration(observable: self, identifier: identifier)
+    }
 
-        override func wasObserved() {
-            sourceSubscription = nil
-        }
-
-        /// Process event
-        ///
-        /// - Parameter event: input event
-        /// - Returns: output event, if any
-        func process(event: Event<T>) -> Event<U>? {
-            return nil
+    /// Process events.
+    ///
+    /// - Parameter event: event to send to observers.
+    override func on(_ event: Event<T>) {
+        observers.values.forEach {
+            $0.on(event)
         }
     }
 
-    /// Implemetation of Proxy with a closure
-    public final class SimpleProxy<U>: Proxy<U> {
+    /// Called when the first observer is about to subscribe
+    private func willBeObserved() {
+        self.willBeObservedCb()
+    }
 
-        /// Process closure
-        private let processCb: (Event<T>) -> Event<U>?
+    /// Called when the last observer did unsubscribe
+    private func wasObserved() {
+        self.wasObservedCb()
+    }
+
+    /// Unsubsribe an observer
+    ///
+    /// - Parameter identifier: observer identifier.
+    private func unsubscribe(_ identifier: ObjectIdentifier) {
+        observers[identifier] = nil
+        if observers.isEmpty {
+            wasObserved()
+        }
+    }
+
+    /// An observer registration
+    private class Registration: Disposable {
+
+        /// Observabe the observer registred to
+        private weak var observable: Observable<T>?
+        /// Observer identifier
+        private let identifier: ObjectIdentifier
 
         /// Constructor
         ///
         /// - Parameters:
-        ///   - source: proxy source
-        ///   - processCb: proecess callback
-        public init(source: Observable<T>, processCb: @escaping (Event<T>) -> Event<U>?) {
-            self.processCb = processCb
-            super.init(source: source)
+        ///   - observable: observabe the observer registred to
+        ///   - identifier: observer identifier
+        init(observable: Observable<T>, identifier: ObjectIdentifier) {
+            self.observable = observable
+            self.identifier = identifier
         }
 
-        override func process(event: Event<T>) -> Event<U>? {
-            return processCb(event)
+        deinit {
+            observable?.unsubscribe(identifier)
         }
     }
 }

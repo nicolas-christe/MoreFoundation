@@ -20,14 +20,33 @@
 
 import Foundation
 
-public extension Observable {
+private class Map<T, U>: ObservableType<U> {
 
-    public func map<U>(_ transform: @escaping (T) -> U) -> Observable<U> {
-        return Observable.SimpleProxy(source: self, processCb: { event in
+    private let source: ObservableType<T>
+    private let transform: (T) -> U
+
+    public init(source: ObservableType<T>, transform: @escaping (T) -> U) {
+        self.source = source
+        self.transform = transform
+    }
+
+    override func subscribe(_ observer: Observer<U>) -> Disposable {
+        return source.subscribe { event in
             switch event {
-            case .next(let value): return .next(transform(value))
-            case .terminated: return .terminated
+            case .next(let value):  observer.on(.next(self.transform(value)))
+            case .terminated:       observer.on(.terminated)
             }
-        })
+        }
+    }
+}
+
+public extension ObservableType {
+
+    /// Filter some `.next` events
+    ///
+    /// - Parameter isIncluded: function called to check if `.next` data must be included
+    /// - Returns: a new obsevable
+    public func map<U>(_ transform: @escaping (T) -> U) -> ObservableType<U> {
+        return Map(source: self, transform: transform)
     }
 }

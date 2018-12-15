@@ -26,7 +26,7 @@ public class Value<T>: Observable<T> {
 
     private var sourceSubscription: Disposable!
 
-    public init(source: Observable<T>) {
+    public init(source: ObservableType<T>) {
         super.init()
         sourceSubscription = source.subscribe { event in
             switch event {
@@ -46,5 +46,15 @@ public class Value<T>: Observable<T> {
             onNext(value)
         }
         return result
+    }
+}
+
+extension Value: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        if let value = value {
+            return "\(value)"
+        }
+        return "nil"
     }
 }

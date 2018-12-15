@@ -20,6 +20,8 @@
 
 import Foundation
 
+/// An observable value
+/// Current value is immediately sent to new registered observer
 public class Variable<T>: Observable<T> {
 
     public private (set) var value: T?
