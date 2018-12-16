@@ -191,24 +191,15 @@ class ObservableTests: XCTestCase {
         assertThat(events, contains(.next("X"), .next("Y")))
     }
 
-    func testVariableNoInitialValue() {
-        let bag = DisposeBag()
-        let variable = Variable<String>()
-
-        var events = [Event<String>]()
-        variable.subscribe({ events.append($0) }).disposed(by: bag)
-        assertThat(events, empty())
-
-        variable.onNext("X")
-        assertThat(events, contains(.next("X")))
-    }
-
     func testValue() {
         let bag = DisposeBag()
         let observable = Observable<String>()
 
-        let value = Value<String>(source: observable)
-        assertThat(value.value, `is`(nilValue()))
+        let value = Value("I")
+        assertThat(value.value, presentAnd(`is`("I")))
+
+        value.bind(to: observable)
+        assertThat(value.value, presentAnd(`is`("I")))
 
         observable.onNext("X")
         assertThat(value.value, presentAnd(`is`("X")))
@@ -222,20 +213,24 @@ class ObservableTests: XCTestCase {
         assertThat(events, contains(.next("X"), .next("Y")))
 
         observable.onTerminated()
-        assertThat(value.value, `is`(nilValue()))
         assertThat(events, contains(.next("X"), .next("Y"), .terminated))
     }
 
     func testValueMapVariable() {
         let variable = Variable("X")
-        let value = Value<String>(source: variable.map { return $0+"X" })
+        let value = Value("")
+
+        value.bind(to: variable.map { return $0+"X" })
         assertThat(value.value, presentAnd(`is`("XX")))
     }
 
-    func testValueOnValue() {
+    func testValueObserveValue() {
         let variable = Variable("X")
-        let value1 = Value(source: variable.map { return $0+"X" })
-        let value2 = Value(source: value1.map { return $0+"X" })
+        let value1 = Value("")
+        let value2 = Value("")
+
+        value1.bind(to: variable.map { return $0+"X" })
+        value2.bind(to: value1.map { return $0+"X" })
         assertThat(value1.value, presentAnd(`is`("XX")))
         assertThat(value2.value, presentAnd(`is`("XXX")))
     }

@@ -24,11 +24,7 @@ import Foundation
 /// Current value is immediately sent to new registered observer
 public class Variable<T>: Observable<T> {
 
-    public private (set) var value: T?
-
-    public init() {
-        super.init()
-    }
+    public private (set) var value: T
 
     public init(_ value: T) {
         self.value = value
@@ -46,9 +42,7 @@ public class Variable<T>: Observable<T> {
 
     override public func subscribe(_ observer: Observer<T>) -> Disposable {
         let result = super.subscribe(observer)
-        if let value = value {
-            onNext(value)
-        }
+        onNext(value)
         return result
     }
 }

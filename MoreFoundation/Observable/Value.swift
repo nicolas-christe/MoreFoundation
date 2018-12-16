@@ -22,19 +22,21 @@ import Foundation
 
 public class Value<T>: Observable<T> {
 
-    public private(set) var value: T?
+    public private(set) var value: T
 
     private var sourceSubscription: Disposable!
 
-    public init(source: ObservableType<T>) {
-        super.init()
-        sourceSubscription = source.subscribe { event in
+    public init(_  initialValue: T) {
+        self.value = initialValue
+    }
+
+    public func bind(to observable: ObservableType<T>) {
+        sourceSubscription = observable.subscribe { event in
             switch event {
             case .next(let value):
                 self.value = value
                 self.onNext(value)
             case .terminated:
-                self.value = nil
                 self.onTerminated()
             }
         }
@@ -42,9 +44,7 @@ public class Value<T>: Observable<T> {
 
     override public func subscribe(_ observer: Observer<T>) -> Disposable {
         let result = super.subscribe(observer)
-        if let value = value {
-            onNext(value)
-        }
+        onNext(value)
         return result
     }
 }
@@ -52,9 +52,6 @@ public class Value<T>: Observable<T> {
 extension Value: CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        if let value = value {
-            return "\(value)"
-        }
-        return "nil"
+        return "\(value)"
     }
 }
