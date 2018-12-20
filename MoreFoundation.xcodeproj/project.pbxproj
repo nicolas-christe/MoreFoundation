@@ -20,6 +20,8 @@
 		3793335A21A6E0F000014386 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793335921A6E0F000014386 /* Value.swift */; };
 		3793336221A6E25500014386 /* ObservableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3793336121A6E25500014386 /* ObservableTests.swift */; };
 		3793336421A6E25500014386 /* libMoreFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3763002C21A6D1E900B61F33 /* libMoreFoundation.a */; };
+		37A7B45721C66AE400126D02 /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7B45621C66AE400126D02 /* Future.swift */; };
+		37A7B45921C6DB0C00126D02 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7B45821C6DB0C00126D02 /* FutureTests.swift */; };
 		37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFBB0F21AD7A13003DC9C9 /* Container.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +62,8 @@
 		3793335F21A6E25500014386 /* MoreFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoreFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3793336121A6E25500014386 /* ObservableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableTests.swift; sourceTree = "<group>"; };
 		3793336321A6E25500014386 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37A7B45621C66AE400126D02 /* Future.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
+		37A7B45821C6DB0C00126D02 /* FutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureTests.swift; sourceTree = "<group>"; };
 		37CFBB0F21AD7A13003DC9C9 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		37FC121521AD59120096F9C9 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -117,6 +121,7 @@
 			children = (
 				3763002F21A6D1E900B61F33 /* Disposable.swift */,
 				376443AE21AE70FA0092BCE8 /* Observable */,
+				37A7B45621C66AE400126D02 /* Future.swift */,
 				374E516121AAB041001ED3FD /* Fatal.swift */,
 				37CFBB0F21AD7A13003DC9C9 /* Container.swift */,
 			);
@@ -141,6 +146,7 @@
 			children = (
 				3793336121A6E25500014386 /* ObservableTests.swift */,
 				376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */,
+				37A7B45821C6DB0C00126D02 /* FutureTests.swift */,
 				3793336321A6E25500014386 /* Info.plist */,
 			);
 			path = MoreFoundationTests;
@@ -287,6 +293,7 @@
 				372D5CB121B3E07500AE1202 /* EventStore.swift in Sources */,
 				3763003C21A6D8DF00B61F33 /* Map.swift in Sources */,
 				378FA15A21B5B25F00140E04 /* Filter.swift in Sources */,
+				37A7B45721C66AE400126D02 /* Future.swift in Sources */,
 				3763003021A6D1E900B61F33 /* Disposable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -297,6 +304,7 @@
 			files = (
 				3793336221A6E25500014386 /* ObservableTests.swift in Sources */,
 				376443AB21ADDA9C0092BCE8 /* ContainerTests.swift in Sources */,
+				37A7B45921C6DB0C00126D02 /* FutureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
