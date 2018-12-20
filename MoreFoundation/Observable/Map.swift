@@ -20,11 +20,19 @@
 
 import Foundation
 
+/// Convert from an Observeable with `Event<T>` to and Observeable with `Event<U>`
 private class Map<T, U>: ObservableType<U> {
 
+    /// Source obervable
     private let source: ObservableType<T>
+    /// `T` ot `U` transform closure
     private let transform: (T) -> U
 
+    /// Constructor
+    ///
+    /// - Parameters:
+    ///   - source: source obervable
+    ///   - transform: `T` ot `U` transform closure
     public init(source: ObservableType<T>, transform: @escaping (T) -> U) {
         self.source = source
         self.transform = transform
@@ -42,11 +50,13 @@ private class Map<T, U>: ObservableType<U> {
 
 public extension ObservableType {
 
-    /// Filter some `.next` events
+    /// Convert from an `Event` data type to `U`
     ///
-    /// - Parameter isIncluded: function called to check if `.next` data must be included
+    /// - Parameters:
+    ///     - transform: closure called to transform`T` ot `U`
+    ///     - eventData: source event data
     /// - Returns: a new obsevable
-    public func map<U>(_ transform: @escaping (T) -> U) -> ObservableType<U> {
+    public func map<U>(_ transform: @escaping (_ eventData: T) -> U) -> ObservableType<U> {
         return Map(source: self, transform: transform)
     }
 }
