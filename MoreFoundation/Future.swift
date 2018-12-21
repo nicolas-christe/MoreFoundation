@@ -79,12 +79,14 @@ public class Future<Value> {
     ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
     ///   - completionBlock: completion block
     ///   - result: completed Future result
-    public func done(on queue: DispatchQueue? = nil, completionBlock: @escaping (Value) -> Void) {
+    @discardableResult
+    public func done(on queue: DispatchQueue? = nil, completionBlock: @escaping (Value) -> Void) -> Future<Value> {
         await(on: queue) { result in
             if case let .value(value) = result {
                 completionBlock(value)
             }
         }
+        return self
     }
 
     /// Call completion block when the Future has completed with an error
@@ -93,12 +95,14 @@ public class Future<Value> {
     ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
     ///   - completionBlock: completion block
     ///   - result: completed Future error
-    public func `catch`(on queue: DispatchQueue? = nil, completionBlock: @escaping (Error) -> Void) {
+    @discardableResult
+    public func `catch`(on queue: DispatchQueue? = nil, completionBlock: @escaping (Error) -> Void) -> Future<Value> {
         await(on: queue) { result in
             if case let .error(error) = result {
                 completionBlock(error)
             }
         }
+        return self
     }
 
     /// Call completion block when the Future has completed

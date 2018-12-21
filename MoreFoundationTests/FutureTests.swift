@@ -38,7 +38,7 @@ private func asyncFunc(promise: Promise<String>, val: String?) {
 
 class FutureTests: XCTestCase {
 
-    func testSingleFuture() {
+    func testAwait() {
         let expectation = XCTestExpectation(description: "promise is fulfilled")
         async { promise in
             asyncFunc(promise: promise, val: "X")
@@ -61,7 +61,7 @@ class FutureTests: XCTestCase {
     }
 
     func testDone() {
-        let expectation = XCTestExpectation(description: "promise is fulfilled")
+        let expectation = XCTestExpectation(description: "Done called")
         async { promise in
             asyncFunc(promise: promise, val: "X")
             }.done { str in
@@ -72,7 +72,7 @@ class FutureTests: XCTestCase {
     }
 
     func testCatch() {
-        let expectation = XCTestExpectation(description: "promise is fulfilled")
+        let expectation = XCTestExpectation(description: "Catch called")
         async { promise in
             asyncFunc(promise: promise, val: nil)
             }.catch { error in
@@ -83,13 +83,41 @@ class FutureTests: XCTestCase {
     }
 
     func testFinally() {
-        let expectation = XCTestExpectation(description: "promise is fulfilled")
+        let expectation = XCTestExpectation(description: "Finally called")
         async { promise in
             asyncFunc(promise: promise, val: nil)
             }.finally {
                 expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1.0)
+    }
+
+    func testDoneFinally() {
+        let expectation1 = XCTestExpectation(description: "Done Called")
+        let expectation2 = XCTestExpectation(description: "finally called")
+        async { promise in
+            asyncFunc(promise: promise, val: "X")
+            }.done { str in
+                assertThat(str, `is`("X"))
+                expectation1.fulfill()
+            }.finally {
+                expectation2.fulfill()
+        }
+        wait(for: [expectation1, expectation2], timeout: 1.0)
+    }
+
+    func testCatchFinally() {
+        let expectation1 = XCTestExpectation(description: "Catch Called")
+        let expectation2 = XCTestExpectation(description: "finally called")
+        async { promise in
+            asyncFunc(promise: promise, val: nil)
+            }.catch { error in
+                assertThat(error as? Error, `is`(Error.fail))
+                expectation1.fulfill()
+            }.finally {
+                expectation2.fulfill()
+        }
+        wait(for: [expectation1, expectation2], timeout: 1.0)
     }
 
     func testThen() {
@@ -106,7 +134,7 @@ class FutureTests: XCTestCase {
     }
 
     func testThen1stFail() {
-        let expectation = XCTestExpectation(description: "promise is fulfilled")
+        let expectation = XCTestExpectation(description: "catch called")
         async { promise in
             asyncFunc(promise: promise, val: nil)
             }.then { promise, value in
@@ -119,7 +147,7 @@ class FutureTests: XCTestCase {
     }
 
     func testThen2ndFail() {
-        let expectation = XCTestExpectation(description: "promise is fulfilled")
+        let expectation = XCTestExpectation(description: "catch called")
         async { promise in
             asyncFunc(promise: promise, val: "X")
             }.then { promise, _ in
