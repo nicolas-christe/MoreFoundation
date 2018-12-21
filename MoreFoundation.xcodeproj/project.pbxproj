@@ -22,6 +22,8 @@
 		3793336421A6E25500014386 /* libMoreFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3763002C21A6D1E900B61F33 /* libMoreFoundation.a */; };
 		37A7B45721C66AE400126D02 /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7B45621C66AE400126D02 /* Future.swift */; };
 		37A7B45921C6DB0C00126D02 /* FutureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7B45821C6DB0C00126D02 /* FutureTests.swift */; };
+		37A7B45B21CD752200126D02 /* Applicable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7B45A21CD752200126D02 /* Applicable.swift */; };
+		37A7B45D21CD769300126D02 /* ApplicableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A7B45C21CD769300126D02 /* ApplicableTests.swift */; };
 		37CFBB1021AD7A13003DC9C9 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CFBB0F21AD7A13003DC9C9 /* Container.swift */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +66,8 @@
 		3793336321A6E25500014386 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		37A7B45621C66AE400126D02 /* Future.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		37A7B45821C6DB0C00126D02 /* FutureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureTests.swift; sourceTree = "<group>"; };
+		37A7B45A21CD752200126D02 /* Applicable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Applicable.swift; sourceTree = "<group>"; };
+		37A7B45C21CD769300126D02 /* ApplicableTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicableTests.swift; sourceTree = "<group>"; };
 		37CFBB0F21AD7A13003DC9C9 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		37FC121521AD59120096F9C9 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -124,6 +128,7 @@
 				37A7B45621C66AE400126D02 /* Future.swift */,
 				374E516121AAB041001ED3FD /* Fatal.swift */,
 				37CFBB0F21AD7A13003DC9C9 /* Container.swift */,
+				37A7B45A21CD752200126D02 /* Applicable.swift */,
 			);
 			path = MoreFoundation;
 			sourceTree = "<group>";
@@ -147,6 +152,7 @@
 				3793336121A6E25500014386 /* ObservableTests.swift */,
 				376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */,
 				37A7B45821C6DB0C00126D02 /* FutureTests.swift */,
+				37A7B45C21CD769300126D02 /* ApplicableTests.swift */,
 				3793336321A6E25500014386 /* Info.plist */,
 			);
 			path = MoreFoundationTests;
@@ -286,6 +292,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3763003721A6D2A000B61F33 /* Observable.swift in Sources */,
+				37A7B45B21CD752200126D02 /* Applicable.swift in Sources */,
 				3763003A21A6D8B500B61F33 /* Variable.swift in Sources */,
 				3793335A21A6E0F000014386 /* Value.swift in Sources */,
 				374E516221AAB041001ED3FD /* Fatal.swift in Sources */,
@@ -302,6 +309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A7B45D21CD769300126D02 /* ApplicableTests.swift in Sources */,
 				3793336221A6E25500014386 /* ObservableTests.swift in Sources */,
 				376443AB21ADDA9C0092BCE8 /* ContainerTests.swift in Sources */,
 				37A7B45921C6DB0C00126D02 /* FutureTests.swift in Sources */,
