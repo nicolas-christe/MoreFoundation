@@ -22,7 +22,7 @@ import Foundation
 
 /// An observable event
 public enum Event<T> {
-    /// Observable providied a next value
+    /// Observable provided a next value
     case next(T)
     /// Observable did terminates
     case terminated
@@ -43,7 +43,7 @@ extension Event: Equatable where T: Equatable {
 /// Base observable type
 public class ObservableType<T> {
 
-    /// True if the observabe is terminated and will not produce more events.
+    /// True if the observable is terminated and will not produce more events.
     public private(set) var terminated = false
 
     /// Subscribe to observable events.
@@ -92,7 +92,7 @@ public class Observer<T> {
         case onTerminated(() -> Void)
     }
 
-    /// registerd handlers
+    /// register handlers
     private let handlers: [EventHandler]
 
     /// Constructor
@@ -147,7 +147,7 @@ public class Observable<T>: ObservableType<T> {
     /// Callback called when the last observer did unsubscribe.
     private let wasObservedCb: () -> Void
 
-    /// Map of obervers.
+    /// Map of observers.
     private var observers = [ObjectIdentifier: Observer<T>]()
 
     public init(willBeObserved: @escaping () -> Void = {}, wasObserved: @escaping () -> Void = {}) {
@@ -207,7 +207,7 @@ public class Observable<T>: ObservableType<T> {
     /// An observer registration
     private class Registration: Disposable {
 
-        /// Observabe the observer registred to
+        /// Observabe the observer registered to
         private weak var observable: Observable<T>?
         /// Observer identifier
         private let identifier: ObjectIdentifier
@@ -215,7 +215,7 @@ public class Observable<T>: ObservableType<T> {
         /// Constructor
         ///
         /// - Parameters:
-        ///   - observable: observabe the observer registred to
+        ///   - observable: observable the observer registered to
         ///   - identifier: observer identifier
         init(observable: Observable<T>, identifier: ObjectIdentifier) {
             self.observable = observable

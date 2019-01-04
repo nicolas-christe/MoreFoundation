@@ -49,9 +49,9 @@ public class Future<Value> {
     private var awaiters = [(DispatchQueue?, (Result<Value>) -> Void)]()
     /// lock
     private let lockQueue = DispatchQueue(label: "MoreFoundation.Future")
-    /// Block to call to cancel the func generating the Future
+    /// Block to call to cancel the function generating the Future
     fileprivate var cancelBlock: (() -> Void)?
-    /// Parrent future, when chained with `then`
+    /// Parent future, when chained with `then`
     fileprivate var parentCancel: (() -> Void)?
     /// True if future as been cancelled
     public private(set) var cancelled = false
@@ -160,7 +160,7 @@ public class Future<Value> {
         }
     }
 
-    /// Notify awaites the future has completed
+    /// Notify waiters the future has completed
     ///
     /// - Parameter result: future result
     private func report(_ result: Result<Value>) {
@@ -194,7 +194,7 @@ public class Promise<Value>: Future<Value> {
 
     /// Reject the promise with an error
     ///
-    /// - Parameter error: promose error
+    /// - Parameter error: promise error
     public func reject(with error: Error) {
         complete(with: .error(error))
     }

@@ -20,12 +20,12 @@
 
 import Foundation
 
-/// A Service that can be registred in a `Container`
-public protocol Service: class {
-    /// Type of the servuce
-    associatedtype ServiceType = Self
+/// A Service that can be registered in a `Container`
+public protocol ServiceType: AnyObject {
+    /// Type of the service
+    associatedtype ServiceClass = Self
     /// service descriptor
-    static var descriptor: Container.ServiceDescriptor<ServiceType> { get }
+    static var descriptor: Container.ServiceDescriptor<ServiceClass> { get }
 }
 
 /// A simple dependency Container.
@@ -36,22 +36,23 @@ public class Container {
         case notFound
         /// Service dependencies loop
         case dependencyLoop
-        /// Service already registred
+        /// Service already registered
         case alreadyRegistred
         /// Exception instantiating service
         case instantiationError(Error)
-        /// Serivce doesn't implement API given in descriptor
+        /// Service doesn't implement API given in descriptor
         case wrongServiceDefinition
     }
 
+    typealias ServiceUid = ObjectIdentifier
     /// Service descriptor
-    /// - paramter Service: service type
+    /// - parameter Service: service type
     public class ServiceDescriptor<Service> {
-        /// Service id
-        fileprivate var sid: ObjectIdentifier!
+        /// Service uid
+        fileprivate private(set) var serviceUid: ServiceUid!
         /// Constructor
         public init() {
-            sid = ObjectIdentifier(self)
+            serviceUid = ServiceUid(self)
         }
     }
 
@@ -65,8 +66,11 @@ public class Container {
         case instantiating
     }
 
-    private var services = [ObjectIdentifier: ServiceRef]()
+    /// Map of registered services
+    private var services = [ServiceUid: ServiceRef]()
+    /// Queue in with services are instanced
     private let queue: DispatchQueue
+    /// Queue identifier
     private let dispatchSpecificKey = DispatchSpecificKey<Bool>()
 
     /// Constructor
@@ -85,15 +89,15 @@ public class Container {
     ///   - factory: factory to create the service
     ///   - container: self
     ///   - service: service to register
-    /// - Throws:  ContainerError.alreadyRegistred if serivce already registered
-    public func register<S: Service>(factory: @escaping (_ container: Container) throws -> S) throws {
-        guard services[S.descriptor.sid] == nil else {
+    /// - Throws:  ContainerError.alreadyRegistred if service already registered
+    public func register<S: ServiceType>(factory: @escaping (_ container: Container) throws -> S) throws {
+        guard services[S.descriptor.serviceUid] == nil else {
             throw ContainerError.alreadyRegistred
         }
-        services[S.descriptor.sid] = .factory(factory)
+        services[S.descriptor.serviceUid] = .factory(factory)
     }
 
-    /// Get a service. Service is instentiated if required.
+    /// Get a service. Service is instantiated if required.
     ///
     /// - Parameter descriptor: descriptor of the service to get
     /// - Returns: Service instance if found
@@ -101,20 +105,20 @@ public class Container {
     public func getService<S>(descriptor: ServiceDescriptor<S>) throws -> S {
         if DispatchQueue.getSpecific(key: dispatchSpecificKey) == nil {
             return try queue.sync {
-                return try self.getServiceQueue(descriptor: descriptor)
+                try self.getServiceLocked(descriptor: descriptor)
             }
         } else {
-            return try getServiceQueue(descriptor: descriptor)
+            return try getServiceLocked(descriptor: descriptor)
         }
     }
 
-    /// Get a service. Service is instentiated if required.
+    /// Get a service. Service is instantiated if required. Run in the container queue.
     ///
     /// - Parameter descriptor: descriptor of the service to get
     /// - Returns: Service instance if found
     /// - Throws:  ContainerError if there is a error getting or creating the service
-    private func getServiceQueue<S>(descriptor: ServiceDescriptor<S>) throws -> S {
-        if let serviceRef = services[descriptor.sid] {
+    private func getServiceLocked<S>(descriptor: ServiceDescriptor<S>) throws -> S {
+        if let serviceRef = services[descriptor.serviceUid] {
             switch serviceRef {
             case .instance(let service):
                 // swiftlint:disable:next force_cast
@@ -138,11 +142,11 @@ public class Container {
     /// - Throws:  ContainerError if there is a error creating the service
     private func create<S>(descriptor: ServiceDescriptor<S>, factory: (_ container: Container) throws ->  AnyObject)
         throws -> S {
-            services[descriptor.sid] = .instantiating
+            services[descriptor.serviceUid] = .instantiating
             do {
                 let instance = try factory(self)
                 if let service = instance as? S {
-                    services[descriptor.sid] = .instance(instance)
+                    services[descriptor.serviceUid] = .instance(instance)
                     return service
                 }
             } catch let containerError as ContainerError {

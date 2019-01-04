@@ -22,23 +22,50 @@ import Foundation
 
 public class EventStore<T> {
 
+    enum Error: Swift.Error {
+        case empty
+        case wrongEventType
+   }
     public private(set) var latestEvents = [Event<T>]()
 
     private let disposeBag = DisposeBag()
 
     public init(source: Observable<T>) {
-        source.subscribe { self.latestEvents.append($0)}.disposed(by: disposeBag)
+        source.subscribe { self.latestEvents.append($0) }.disposed(by: disposeBag)
     }
 
     public func clear() {
         latestEvents = []
     }
 
-    public func pop() -> Event<T>? {
-        if !latestEvents.isEmpty {
-            return latestEvents.removeFirst()
+    public func pop() throws -> Event<T> {
+        guard !latestEvents.isEmpty else {
+            throw Error.empty
         }
-        return nil
+        return latestEvents.removeFirst()
+    }
+
+    public func popValue() throws -> T {
+        guard !latestEvents.isEmpty else {
+            throw Error.empty
+        }
+        guard case let .next(value) = latestEvents.removeFirst() else {
+            throw Error.wrongEventType
+        }
+        return value
+    }
+
+    public func popTerminated() throws {
+        guard !latestEvents.isEmpty else {
+            throw Error.empty
+        }
+        guard case .terminated = latestEvents.removeFirst() else {
+            throw Error.wrongEventType
+        }
+    }
+
+    public func peek() -> Event<T>? {
+        return latestEvents.first
     }
 }
 

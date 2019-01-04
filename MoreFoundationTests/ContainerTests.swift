@@ -31,7 +31,7 @@ func isNamed(_ name: String) -> Matcher<Named> {
 }
 
 // A single class simple service
-class SimpleService: Service, Named {
+class SimpleService: ServiceType, Named {
     static var descriptor = Container.ServiceDescriptor<SimpleService>()
     func getName() -> String {
         return "SimpleService"
@@ -45,7 +45,7 @@ protocol FullServiceProtocol: Named {
 let fullServiceDescriptor = Container.ServiceDescriptor<FullServiceProtocol>()
 
 // An implementation of FullServiceProtocol
-class FullService: FullServiceProtocol, Service {
+class FullService: FullServiceProtocol, ServiceType {
     static var descriptor = fullServiceDescriptor
     func getName() -> String {
         return "FullService"
@@ -53,7 +53,7 @@ class FullService: FullServiceProtocol, Service {
 }
 
 // An aternate implementation of FullServiceProtocol
-class AlternateFullService: FullServiceProtocol, Service {
+class AlternateFullService: FullServiceProtocol, ServiceType {
     static var descriptor = fullServiceDescriptor
     func getName() -> String {
         return "AlternateFullService"
@@ -61,7 +61,7 @@ class AlternateFullService: FullServiceProtocol, Service {
 }
 
 // A service dependent on an other service
-class DependentService: Service, Named {
+class DependentService: ServiceType, Named {
     static var descriptor = Container.ServiceDescriptor<DependentService>()
     let fullService: FullServiceProtocol
     init(container: Container) throws {
@@ -72,21 +72,21 @@ class DependentService: Service, Named {
     }
 }
 
-class DependencyLoopService1: Service {
+class DependencyLoopService1: ServiceType {
     static var descriptor = Container.ServiceDescriptor<DependencyLoopService1>()
     init(container: Container) throws {
         _ = try container.getService(descriptor: DependencyLoopService2.descriptor)
     }
 }
 
-class DependencyLoopService2: Service {
+class DependencyLoopService2: ServiceType {
     static var descriptor = Container.ServiceDescriptor<DependencyLoopService2>()
     init(container: Container) throws {
         _ = try container.getService(descriptor: DependencyLoopService1.descriptor)
     }
 }
 
-class FailingService: Service {
+class FailingService: ServiceType {
     static var descriptor = Container.ServiceDescriptor<FailingService>()
     enum Err: Error {
         case error
@@ -96,7 +96,7 @@ class FailingService: Service {
     }
 }
 
-class WrongService: Service {
+class WrongService: ServiceType {
     static var descriptor = Container.ServiceDescriptor<FailingService>()
 }
 
@@ -113,7 +113,7 @@ class ContainerTests: XCTestCase {
 
     func testSimpleService() throws {
         try container.register { _ in
-            return SimpleService()
+            SimpleService()
         }
         // get the SimpleService
         let service = try? container.getService(descriptor: SimpleService.descriptor)
@@ -125,7 +125,7 @@ class ContainerTests: XCTestCase {
 
     func testFullService() throws {
         try container.register { _ in
-            return FullService()
+            FullService()
         }
         let service = try? container.getService(descriptor: fullServiceDescriptor)
         assertThat(service, presentAnd(isNamed("FullService")))
@@ -133,7 +133,7 @@ class ContainerTests: XCTestCase {
 
     func testAlternaleFullService() throws {
         try container.register { _ in
-            return AlternateFullService()
+            AlternateFullService()
         }
         let service = try? container.getService(descriptor: fullServiceDescriptor)
         assertThat(service, presentAnd(isNamed("AlternateFullService")))
@@ -141,10 +141,10 @@ class ContainerTests: XCTestCase {
 
     func testDependentService() throws {
         try container.register { container in
-            return try DependentService(container: container)
+            try DependentService(container: container)
         }
         try container.register { _ in
-            return FullService()
+            FullService()
         }
         let service = try? container.getService(descriptor: DependentService.descriptor)
         assertThat(service, presentAnd(isNamed("DependentService-FullService")))
@@ -163,10 +163,10 @@ class ContainerTests: XCTestCase {
     func testDuplicateRegister() throws {
         do {
             try container.register { _ in
-                return SimpleService()
+                SimpleService()
             }
             try container.register { _ in
-                return SimpleService()
+                SimpleService()
             }
             XCTFail("must have thrown")
         } catch Container.ContainerError.alreadyRegistred {
@@ -177,7 +177,7 @@ class ContainerTests: XCTestCase {
 
     func testInstantiateFailure() throws {
         try container.register { _ in
-            return try FailingService()
+            try FailingService()
         }
         do {
             _ = try container.getService(descriptor: FailingService.descriptor)
@@ -190,7 +190,7 @@ class ContainerTests: XCTestCase {
 
     func testWrongService() throws {
         try container.register { _ in
-            return WrongService()
+            WrongService()
         }
         do {
             _ = try container.getService(descriptor: WrongService.descriptor)
@@ -203,10 +203,10 @@ class ContainerTests: XCTestCase {
 
     func testDependencyLoop() throws {
         try container.register { container in
-            return try DependencyLoopService1(container: container)
+            try DependencyLoopService1(container: container)
         }
         try container.register { container in
-            return try DependencyLoopService2(container: container)
+            try DependencyLoopService2(container: container)
         }
         do {
             _ = try container.getService(descriptor: DependencyLoopService1.descriptor)

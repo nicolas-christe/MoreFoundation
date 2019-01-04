@@ -33,18 +33,18 @@ class ObservableTests: XCTestCase {
         var wasObserved = 0
 
         let observable = Observable<String>(
-            willBeObserved: { willBeObservedCnt += 1},
-            wasObserved: { wasObserved += 1})
+            willBeObserved: { willBeObservedCnt += 1 },
+            wasObserved: { wasObserved += 1 })
 
         observable.onNext("1")
         assertThat(willBeObservedCnt, `is`(0))
         assertThat(wasObserved, `is`(0))
 
-        observable.subscribe({ _ in}).disposed(by: bag1)
+        observable.subscribe({ _ in }).disposed(by: bag1)
         assertThat(willBeObservedCnt, `is`(1))
         assertThat(wasObserved, `is`(0))
 
-        observable.subscribe({ _ in}).disposed(by: bag2)
+        observable.subscribe({ _ in }).disposed(by: bag2)
         assertThat(willBeObservedCnt, `is`(1))
         assertThat(wasObserved, `is`(0))
 
@@ -73,7 +73,7 @@ class ObservableTests: XCTestCase {
         assertThat(events1, contains(.next("X")))
 
         // check 2nd observer is also notified
-        observable.subscribe({events2.append($0)}).disposed(by: bag2)
+        observable.subscribe({ events2.append($0) }).disposed(by: bag2)
         observable.onNext("Y")
         assertThat(events1, contains(.next("X"), .next("Y")))
         assertThat(events2, contains(.next("Y")))
@@ -100,7 +100,7 @@ class ObservableTests: XCTestCase {
         observable.subscribe(
             .onEvent { events.append($0) },
             .onNext { values.append($0) },
-            .onTerminated { terminated += 1})
+            .onTerminated { terminated += 1 })
         .disposed(by: bag)
 
         assertThat(events, `is`(empty()))
@@ -124,7 +124,7 @@ class ObservableTests: XCTestCase {
         var events = [Event<String>]()
 
         observable.onTerminated()
-        observable.subscribe({events.append($0)}).disposed(by: bag)
+        observable.subscribe({ events.append($0) }).disposed(by: bag)
         assertThat(events, contains(.terminated))
     }
 
@@ -220,7 +220,7 @@ class ObservableTests: XCTestCase {
         let variable = Variable("X")
         let value = Value("")
 
-        value.bind(to: variable.map { return $0+"X" })
+        value.bind(to: variable.map { $0+"X" })
         assertThat(value.value, presentAnd(`is`("XX")))
     }
 
@@ -229,26 +229,25 @@ class ObservableTests: XCTestCase {
         let value1 = Value("")
         let value2 = Value("")
 
-        value1.bind(to: variable.map { return $0+"X" })
-        value2.bind(to: value1.map { return $0+"X" })
+        value1.bind(to: variable.map { $0+"X" })
+        value2.bind(to: value1.map { $0+"X" })
         assertThat(value1.value, presentAnd(`is`("XX")))
         assertThat(value2.value, presentAnd(`is`("XXX")))
     }
 
-    func testEventStore() {
+    func testEventStore() throws {
         let observable = Observable<String>()
         let store = observable.subscribeStore()
 
-        assertThat(store.pop(), `is`(nilValue()))
+        assertThat(store.peek(), `is`(nilValue()))
 
         observable.onNext("X")
-        assertThat(store.pop()?.value, presentAnd(`is`("X")))
+        assertThat(try store.pop().value, presentAnd(`is`("X")))
 
         observable.onNext("Y")
-        assertThat(store.pop()?.value, presentAnd(`is`("Y")))
+        assertThat(try store.popValue(), presentAnd(`is`("Y")))
 
         observable.onTerminated()
-        let event = store.pop()
-        assertThat(event, `is`(.terminated))
+        try store.popTerminated()
     }
 }
