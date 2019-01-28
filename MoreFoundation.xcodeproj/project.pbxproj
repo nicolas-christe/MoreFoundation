@@ -126,8 +126,8 @@
 				3763002F21A6D1E900B61F33 /* Disposable.swift */,
 				376443AE21AE70FA0092BCE8 /* Observable */,
 				37A7B45621C66AE400126D02 /* Future.swift */,
-				374E516121AAB041001ED3FD /* Fatal.swift */,
 				37CFBB0F21AD7A13003DC9C9 /* Container.swift */,
+				374E516121AAB041001ED3FD /* Fatal.swift */,
 				37A7B45A21CD752200126D02 /* Applicable.swift */,
 			);
 			path = MoreFoundation;

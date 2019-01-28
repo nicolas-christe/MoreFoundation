@@ -64,8 +64,8 @@ class AlternateFullService: FullServiceProtocol, ServiceType {
 class DependentService: ServiceType, Named {
     static var descriptor = Container.ServiceDescriptor<DependentService>()
     let fullService: FullServiceProtocol
-    init(container: Container) throws {
-        self.fullService = try container.getService(descriptor: fullServiceDescriptor)
+    init(container: Container) {
+        self.fullService = container.getService(descriptor: fullServiceDescriptor)
     }
     func getName() -> String {
         return "DependentService-\(fullService.getName())"
@@ -74,30 +74,20 @@ class DependentService: ServiceType, Named {
 
 class DependencyLoopService1: ServiceType {
     static var descriptor = Container.ServiceDescriptor<DependencyLoopService1>()
-    init(container: Container) throws {
-        _ = try container.getService(descriptor: DependencyLoopService2.descriptor)
+    init(container: Container) {
+        _ = container.getService(descriptor: DependencyLoopService2.descriptor)
     }
 }
 
 class DependencyLoopService2: ServiceType {
     static var descriptor = Container.ServiceDescriptor<DependencyLoopService2>()
-    init(container: Container) throws {
-        _ = try container.getService(descriptor: DependencyLoopService1.descriptor)
-    }
-}
-
-class FailingService: ServiceType {
-    static var descriptor = Container.ServiceDescriptor<FailingService>()
-    enum Err: Error {
-        case error
-    }
-    init() throws {
-        throw Err.error
+    init(container: Container) {
+        _ = container.getService(descriptor: DependencyLoopService1.descriptor)
     }
 }
 
 class WrongService: ServiceType {
-    static var descriptor = Container.ServiceDescriptor<FailingService>()
+    static var descriptor = Container.ServiceDescriptor<SimpleService>()
 }
 
 class ContainerTests: XCTestCase {
@@ -112,108 +102,107 @@ class ContainerTests: XCTestCase {
     }
 
     func testSimpleService() throws {
-        try container.register { _ in
+        container.register { _ in
             SimpleService()
         }
         // get the SimpleService
-        let service = try? container.getService(descriptor: SimpleService.descriptor)
-        assertThat(service, presentAnd(isNamed("SimpleService")))
+        let service = container.getService(descriptor: SimpleService.descriptor)
+        assertThat(service, isNamed("SimpleService"))
         // get the SimpleService a 2nd time, ensure it's the same instance
-        let service2 = try? container.getService(descriptor: SimpleService.descriptor)
+        let service2 = container.getService(descriptor: SimpleService.descriptor)
         XCTAssertTrue(service === service2)
     }
 
     func testFullService() throws {
-        try container.register { _ in
+        container.register { _ in
             FullService()
         }
-        let service = try? container.getService(descriptor: fullServiceDescriptor)
-        assertThat(service, presentAnd(isNamed("FullService")))
+        let service = container.getService(descriptor: fullServiceDescriptor)
+        assertThat(service, isNamed("FullService"))
     }
 
     func testAlternaleFullService() throws {
-        try container.register { _ in
+        container.register { _ in
             AlternateFullService()
         }
-        let service = try? container.getService(descriptor: fullServiceDescriptor)
-        assertThat(service, presentAnd(isNamed("AlternateFullService")))
+        let service = container.getService(descriptor: fullServiceDescriptor)
+        assertThat(service, isNamed("AlternateFullService"))
     }
 
     func testDependentService() throws {
-        try container.register { container in
-            try DependentService(container: container)
+        container.register { container in
+            DependentService(container: container)
         }
-        try container.register { _ in
+        container.register { _ in
             FullService()
         }
-        let service = try? container.getService(descriptor: DependentService.descriptor)
-        assertThat(service, presentAnd(isNamed("DependentService-FullService")))
+        let service = container.getService(descriptor: DependentService.descriptor)
+        assertThat(service, isNamed("DependentService-FullService"))
     }
 
-    func testServiceNotFound() throws {
-        do {
-            _ = try container.getService(descriptor: SimpleService.descriptor)
-            XCTFail("must have thrown")
-        } catch Container.ContainerError.notFound {
-        } catch let err {
-            XCTFail("\(err)")
+    func testServiceNotFound() {
+        let expectation = self.expectation(description: "expectingFatal")
+        fatalInterceptor = { _ in
+            expectation.fulfill()
+            never()
         }
+        DispatchQueue.global(qos: .userInitiated).async {
+            _ = self.container.getService(descriptor: SimpleService.descriptor)
+        }
+        waitForExpectations(timeout: 5)
+        fatalInterceptor = nil
     }
 
-    func testDuplicateRegister() throws {
-        do {
-            try container.register { _ in
+    func testDuplicateRegister() {
+        let expectation = self.expectation(description: "expectingFatal")
+        fatalInterceptor = { _ in
+            expectation.fulfill()
+            never()
+        }
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.container.register { _ in
                 SimpleService()
             }
-            try container.register { _ in
+            self.container.register { _ in
                 SimpleService()
             }
-            XCTFail("must have thrown")
-        } catch Container.ContainerError.alreadyRegistred {
-        } catch let err {
-            XCTFail("\(err)")
         }
-    }
-
-    func testInstantiateFailure() throws {
-        try container.register { _ in
-            try FailingService()
-        }
-        do {
-            _ = try container.getService(descriptor: FailingService.descriptor)
-            XCTFail("must have thrown")
-        } catch Container.ContainerError.instantiationError {
-        } catch let err {
-            XCTFail("\(err)")
-        }
+        waitForExpectations(timeout: 5)
+        fatalInterceptor = nil
     }
 
     func testWrongService() throws {
-        try container.register { _ in
-            WrongService()
+        let expectation = self.expectation(description: "expectingFatal")
+        fatalInterceptor = { _ in
+            expectation.fulfill()
+            never()
         }
-        do {
-            _ = try container.getService(descriptor: WrongService.descriptor)
-            XCTFail("must have thrown")
-        } catch Container.ContainerError.wrongServiceDefinition {
-        } catch let err {
-            XCTFail("\(err)")
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.container.register { _ in
+                WrongService()
+            }
+            _ = self.container.getService(descriptor: WrongService.descriptor)
         }
+        waitForExpectations(timeout: 5)
+        fatalInterceptor = nil
     }
 
     func testDependencyLoop() throws {
-        try container.register { container in
-            try DependencyLoopService1(container: container)
+        let expectation = self.expectation(description: "expectingFatal")
+        fatalInterceptor = { _ in
+            expectation.fulfill()
+            never()
         }
-        try container.register { container in
-            try DependencyLoopService2(container: container)
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.container.register { container in
+                DependencyLoopService1(container: container)
+            }
+            self.container.register { container in
+                DependencyLoopService2(container: container)
+            }
+            _ = self.container.getService(descriptor: DependencyLoopService1.descriptor)
         }
-        do {
-            _ = try container.getService(descriptor: DependencyLoopService1.descriptor)
-            XCTFail("must have thrown")
-        } catch Container.ContainerError.dependencyLoop {
-        } catch let err {
-            XCTFail("\(err)")
-        }
+        waitForExpectations(timeout: 5)
+        fatalInterceptor = nil
     }
 }

@@ -140,7 +140,7 @@ class ObservableTests: XCTestCase {
             observable.onTerminated()
             observable.onNext("X")
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
         fatalInterceptor = nil
     }
 

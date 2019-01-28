@@ -1,4 +1,4 @@
-/// Copyright (c) 2017-18 Nicolas Christe
+/// Copyright (c) 2017-19 Nicolas Christe
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,20 +30,8 @@ public protocol ServiceType: AnyObject {
 
 /// A simple dependency Container.
 public class Container {
-    /// Errors
-    public enum ContainerError: Error {
-        /// Service not found
-        case notFound
-        /// Service dependencies loop
-        case dependencyLoop
-        /// Service already registered
-        case alreadyRegistred
-        /// Exception instantiating service
-        case instantiationError(Error)
-        /// Service doesn't implement API given in descriptor
-        case wrongServiceDefinition
-    }
 
+    /// Service unique identifier type
     typealias ServiceUid = ObjectIdentifier
     /// Service descriptor
     /// - parameter Service: service type
@@ -61,7 +49,7 @@ public class Container {
         /// Ref on a service instance
         case instance(AnyObject)
         /// Ref on a service factory
-        case factory((Container) throws -> AnyObject)
+        case factory((Container) -> AnyObject)
         /// Transitive state: service is currently instantiated. Used for dependency loop detection
         case instantiating
     }
@@ -89,10 +77,9 @@ public class Container {
     ///   - factory: factory to create the service
     ///   - container: self
     ///   - service: service to register
-    /// - Throws:  ContainerError.alreadyRegistred if service already registered
-    public func register<S: ServiceType>(factory: @escaping (_ container: Container) throws -> S) throws {
+    public func register<S: ServiceType>(factory: @escaping (_ container: Container) -> S) {
         guard services[S.descriptor.serviceUid] == nil else {
-            throw ContainerError.alreadyRegistred
+            fatal("Service Already registered")
         }
         services[S.descriptor.serviceUid] = .factory(factory)
     }
@@ -101,14 +88,13 @@ public class Container {
     ///
     /// - Parameter descriptor: descriptor of the service to get
     /// - Returns: Service instance if found
-    /// - Throws:  ContainerError if there is a error getting or creating the service
-    public func getService<S>(descriptor: ServiceDescriptor<S>) throws -> S {
+    public func getService<S>(descriptor: ServiceDescriptor<S>) -> S {
         if DispatchQueue.getSpecific(key: dispatchSpecificKey) == nil {
-            return try queue.sync {
-                try self.getServiceLocked(descriptor: descriptor)
+            return queue.sync {
+                self.getServiceLocked(descriptor: descriptor)
             }
         } else {
-            return try getServiceLocked(descriptor: descriptor)
+            return getServiceLocked(descriptor: descriptor)
         }
     }
 
@@ -116,20 +102,19 @@ public class Container {
     ///
     /// - Parameter descriptor: descriptor of the service to get
     /// - Returns: Service instance if found
-    /// - Throws:  ContainerError if there is a error getting or creating the service
-    private func getServiceLocked<S>(descriptor: ServiceDescriptor<S>) throws -> S {
+    private func getServiceLocked<S>(descriptor: ServiceDescriptor<S>) -> S {
         if let serviceRef = services[descriptor.serviceUid] {
             switch serviceRef {
             case .instance(let service):
                 // swiftlint:disable:next force_cast
                 return service as! S
             case .factory(let factory):
-                return try create(descriptor: descriptor, factory: factory)
+                return create(descriptor: descriptor, factory: factory)
             case .instantiating:
-                throw ContainerError.dependencyLoop
+                fatal("Container dependency loop")
             }
         }
-        throw ContainerError.notFound
+        fatal("Container service \(descriptor) not found")
     }
 
     /// Instantiate a service
@@ -139,21 +124,12 @@ public class Container {
     ///   - factory: service factory closure
     ///   - container: self
     /// - Returns: created service service
-    /// - Throws:  ContainerError if there is a error creating the service
-    private func create<S>(descriptor: ServiceDescriptor<S>, factory: (_ container: Container) throws ->  AnyObject)
-        throws -> S {
-            services[descriptor.serviceUid] = .instantiating
-            do {
-                let instance = try factory(self)
-                if let service = instance as? S {
-                    services[descriptor.serviceUid] = .instance(instance)
-                    return service
-                }
-            } catch let containerError as ContainerError {
-                throw containerError
-            } catch let err {
-                throw ContainerError.instantiationError(err)
-            }
-            throw ContainerError.wrongServiceDefinition
+    private func create<S>(descriptor: ServiceDescriptor<S>, factory: (_ container: Container) -> AnyObject) -> S {
+        services[descriptor.serviceUid] = .instantiating
+        if let service = factory(self) as? S {
+            services[descriptor.serviceUid] = .instance(service as AnyObject)
+            return service
+        }
+        fatal("Container service \(descriptor) invalid type")
     }
 }
