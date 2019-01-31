@@ -31,7 +31,7 @@ func isNamed(_ name: String) -> Matcher<Named> {
 }
 
 // A single class simple service
-class SimpleService: ServiceType, Named {
+class SimpleService: ContainerService, Named {
     static var descriptor = Container.ServiceDescriptor<SimpleService>()
     func getName() -> String {
         return "SimpleService"
@@ -45,7 +45,7 @@ protocol FullServiceProtocol: Named {
 let fullServiceDescriptor = Container.ServiceDescriptor<FullServiceProtocol>()
 
 // An implementation of FullServiceProtocol
-class FullService: FullServiceProtocol, ServiceType {
+class FullService: FullServiceProtocol, ContainerService {
     static var descriptor = fullServiceDescriptor
     func getName() -> String {
         return "FullService"
@@ -53,7 +53,7 @@ class FullService: FullServiceProtocol, ServiceType {
 }
 
 // An aternate implementation of FullServiceProtocol
-class AlternateFullService: FullServiceProtocol, ServiceType {
+class AlternateFullService: FullServiceProtocol, ContainerService {
     static var descriptor = fullServiceDescriptor
     func getName() -> String {
         return "AlternateFullService"
@@ -61,7 +61,7 @@ class AlternateFullService: FullServiceProtocol, ServiceType {
 }
 
 // A service dependent on an other service
-class DependentService: ServiceType, Named {
+class DependentService: ContainerService, Named {
     static var descriptor = Container.ServiceDescriptor<DependentService>()
     let fullService: FullServiceProtocol
     init(container: Container) {
@@ -72,21 +72,21 @@ class DependentService: ServiceType, Named {
     }
 }
 
-class DependencyLoopService1: ServiceType {
+class DependencyLoopService1: ContainerService {
     static var descriptor = Container.ServiceDescriptor<DependencyLoopService1>()
     init(container: Container) {
         _ = container.getService(descriptor: DependencyLoopService2.descriptor)
     }
 }
 
-class DependencyLoopService2: ServiceType {
+class DependencyLoopService2: ContainerService {
     static var descriptor = Container.ServiceDescriptor<DependencyLoopService2>()
     init(container: Container) {
         _ = container.getService(descriptor: DependencyLoopService1.descriptor)
     }
 }
 
-class WrongService: ServiceType {
+class WrongService: ContainerService {
     static var descriptor = Container.ServiceDescriptor<SimpleService>()
 }
 

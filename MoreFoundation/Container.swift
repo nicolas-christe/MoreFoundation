@@ -21,7 +21,7 @@
 import Foundation
 
 /// A Service that can be registered in a `Container`
-public protocol ServiceType: AnyObject {
+public protocol ContainerService: AnyObject {
     /// Type of the service
     associatedtype ServiceClass = Self
     /// service descriptor
@@ -77,7 +77,7 @@ public class Container {
     ///   - factory: factory to create the service
     ///   - container: self
     ///   - service: service to register
-    public func register<S: ServiceType>(factory: @escaping (_ container: Container) -> S) {
+    public func register<S: ContainerService>(factory: @escaping (_ container: Container) -> S) {
         guard services[S.descriptor.serviceUid] == nil else {
             fatal("Service Already registered")
         }
