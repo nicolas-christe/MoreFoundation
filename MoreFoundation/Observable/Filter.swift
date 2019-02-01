@@ -46,7 +46,7 @@ public extension ObservableType {
     ///
     /// - Parameter isIncluded: function called to check if `.next` data must be included
     /// - Returns: a new observable
-    public func filter(_ isIncluded: @escaping (T) -> Bool) -> ObservableType<T> {
+    func filter(_ isIncluded: @escaping (T) -> Bool) -> ObservableType<T> {
         return Filter(source: self, isIncluded: isIncluded)
     }
 }

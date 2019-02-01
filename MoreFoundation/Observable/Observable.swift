@@ -130,11 +130,11 @@ public class Observer<T> {
 // Add convenience subscribe
 public extension ObservableType {
 
-    public func subscribe(_ handlers: Observer<T>.EventHandler...) -> Disposable {
+    func subscribe(_ handlers: Observer<T>.EventHandler...) -> Disposable {
         return subscribe(Observer(handlers))
     }
 
-    public func subscribe(_ eventHandler: @escaping (Event<T>) -> Void) -> Disposable {
+    func subscribe(_ eventHandler: @escaping (Event<T>) -> Void) -> Disposable {
         return subscribe(Observer(.onEvent(eventHandler)))
     }
 }

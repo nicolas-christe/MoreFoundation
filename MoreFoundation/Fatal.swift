@@ -27,7 +27,7 @@ public func fatal(_ message: @autoclosure () -> String = "", file: StaticString 
         if let fatalInterceptor = fatalInterceptor {
             fatalInterceptor(message())
         }
-        fatalError(message, file: file, line: line)
+        fatalError(message(), file: file, line: line)
 }
 
 public func never() -> Never {

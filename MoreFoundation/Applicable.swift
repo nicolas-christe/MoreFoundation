@@ -32,7 +32,7 @@ public protocol Applicable {}
 // MARK: - Extension for Any
 public extension Applicable where Self: Any {
 
-    public func apply(_ block: (inout Self) throws -> Void) rethrows -> Self {
+    func apply(_ block: (inout Self) throws -> Void) rethrows -> Self {
         var mutableSelf = self
         try block(&mutableSelf)
         return mutableSelf
@@ -42,7 +42,7 @@ public extension Applicable where Self: Any {
 // MARK: - Extension for AnyObject
 public extension Applicable where Self: AnyObject {
 
-    public func apply(_ block: (Self) throws -> Void) rethrows -> Self {
+    func apply(_ block: (Self) throws -> Void) rethrows -> Self {
         try block(self)
         return self
     }

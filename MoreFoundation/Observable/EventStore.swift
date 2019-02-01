@@ -70,7 +70,7 @@ public class EventStore<T> {
 }
 
 public extension Observable {
-    public func subscribeStore() -> EventStore<T> {
+    func subscribeStore() -> EventStore<T> {
         return EventStore(source: self)
     }
 }

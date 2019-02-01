@@ -56,7 +56,7 @@ public extension ObservableType {
     ///     - transform: closure called to transform `T` to `U`
     ///     - eventData: source event data
     /// - Returns: a new observable
-    public func map<U>(_ transform: @escaping (_ eventData: T) -> U) -> ObservableType<U> {
+    func map<U>(_ transform: @escaping (_ eventData: T) -> U) -> ObservableType<U> {
         return Map(source: self, transform: transform)
     }
 }
