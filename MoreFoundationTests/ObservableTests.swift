@@ -160,6 +160,26 @@ class ObservableTests: XCTestCase {
         assertThat(events, contains(.next(3), .terminated))
     }
 
+    // test ".compactMap()" function
+    func testCompactMap() {
+        let bag = DisposeBag()
+        let observable = Observable<String?>()
+
+        var events = [Event<Int>]()
+
+        observable.compactMap({ $0.count }).subscribe({ events.append($0) }).disposed(by: bag)
+
+        observable.onNext(nil)
+        assertThat(events, `is`(empty()))
+
+        observable.onNext("123")
+        assertThat(events, contains(.next(3)))
+
+        observable.onTerminated()
+        assertThat(events, contains(.next(3), .terminated))
+    }
+
+    // test ".filter()" function
     func testFilter() {
         let bag = DisposeBag()
         let observable = Observable<String>()
@@ -187,7 +207,7 @@ class ObservableTests: XCTestCase {
         // ensure that initial value is notified
         assertThat(events, contains(.next("X")))
 
-        variable.onNext("Y")
+        variable.set("Y")
         assertThat(events, contains(.next("X"), .next("Y")))
     }
 
@@ -214,6 +234,30 @@ class ObservableTests: XCTestCase {
 
         observable.onTerminated()
         assertThat(events, contains(.next("X"), .next("Y"), .terminated))
+    }
+
+    func testBind() {
+        // swiftlint:disable:next nesting
+        class Bound: Bindable {
+            var event: Event<String>?
+            var next: String?
+            var terminated = false
+        }
+
+        let bag = DisposeBag()
+        let observable = Observable<String>()
+        let bound = Bound()
+
+        bound.bind(to: observable, .onEvent { $0.event = $1 }).disposed(by: bag)
+        bound.bind(to: observable, .onNext { $0.next = $1 }).disposed(by: bag)
+        bound.bind(to: observable, .onTerminated { $0.terminated = true }).disposed(by: bag)
+
+        observable.onNext("XXX")
+        assertThat(bound.event, `is`(.next("XXX")))
+        assertThat(bound.next, `is`("XXX"))
+
+        observable.onTerminated()
+        assertThat(bound.terminated, `is`(true))
     }
 
     func testValueMapVariable() {

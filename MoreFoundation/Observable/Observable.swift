@@ -1,4 +1,4 @@
-/// Copyright (c) 2018 Nicolas Christe
+/// Copyright (c) 2018-19 Nicolas Christe
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -44,37 +44,13 @@ extension Event: Equatable where T: Equatable {
 public class ObservableType<T> {
 
     /// True if the observable is terminated and will not produce more events.
-    public private(set) var terminated = false
+    public fileprivate(set) var terminated = false
 
     /// Subscribe to observable events.
     ///
     /// - Parameter observer: observer to subscribe.
     /// - Returns: Disposable. Observer is subscribed until this disposable is deleted.
     func subscribe(_ observer: Observer<T>) -> Disposable {
-        fatal("Must be overriden")
-    }
-
-    /// Send `.next` event to all observers.
-    ///
-    /// - Parameter value: next value.
-    public func onNext(_ value: T) {
-        guard !terminated else {
-            fatal("onNext called on a terminated observable")
-        }
-        self.on(.next(value))
-    }
-
-    /// Send `.terminated` event to all observers.
-    public func onTerminated() {
-        guard !terminated else { return }
-        terminated = true
-        self.on(.terminated)
-    }
-
-    /// Process events.
-    ///
-    /// - Parameter event: event to send to observers.
-    fileprivate func on(_ event: Event<T>) {
         fatal("Must be overriden")
     }
 }
@@ -175,10 +151,27 @@ public class Observable<T>: ObservableType<T> {
         return Registration(observable: self, identifier: identifier)
     }
 
+    /// Send `.next` event to all observers.
+    ///
+    /// - Parameter value: next value.
+    public func onNext(_ value: T) {
+        guard !terminated else {
+            fatal("onNext called on a terminated observable")
+        }
+        self.on(.next(value))
+    }
+
+    /// Send `.terminated` event to all observers.
+    public func onTerminated() {
+        guard !terminated else { return }
+        terminated = true
+        self.on(.terminated)
+    }
+
     /// Process events.
     ///
     /// - Parameter event: event to send to observers.
-    override func on(_ event: Event<T>) {
+    func on(_ event: Event<T>) {
         observers.values.forEach {
             $0.on(event)
         }
