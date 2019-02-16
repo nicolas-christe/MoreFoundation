@@ -25,12 +25,12 @@ private class Filter<T>: ObservableType<T> {
     private let source: ObservableType<T>
     private let isIncluded: (T) -> Bool
 
-    public init(source: ObservableType<T>, isIncluded: @escaping (T) -> Bool) {
+    fileprivate init(source: ObservableType<T>, isIncluded: @escaping (T) -> Bool) {
         self.source = source
         self.isIncluded = isIncluded
     }
 
-    override func subscribe(_ observer: Observer<T>) -> Disposable {
+    override fileprivate func subscribe(_ observer: Observer<T>) -> Disposable {
         return source.subscribe { event in
             if case let .next(value) = event, !self.isIncluded(value) {
             } else {

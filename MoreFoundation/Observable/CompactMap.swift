@@ -44,12 +44,12 @@ private class CompactMap<T, U>: ObservableType<U> where T: OptionalType {
     /// - Parameters:
     ///   - source: source observable
     ///   - transform: `T` to `U` transform closure
-    public init(source: ObservableType<T>, transform: @escaping (T.WrappedType) -> U) {
+    fileprivate init(source: ObservableType<T>, transform: @escaping (T.WrappedType) -> U) {
         self.source = source
         self.transform = transform
     }
 
-    override func subscribe(_ observer: Observer<U>) -> Disposable {
+    override fileprivate func subscribe(_ observer: Observer<U>) -> Disposable {
         return source.subscribe { event in
             switch event {
             case .next(let value):
@@ -76,6 +76,6 @@ public extension ObservableType where T: OptionalType {
     }
 
     func compactMap() -> ObservableType<T.WrappedType> {
-        return CompactMap(source: self, transform: {$0})
+        return CompactMap(source: self, transform: { $0 })
     }
 }

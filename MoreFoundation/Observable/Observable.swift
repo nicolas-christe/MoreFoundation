@@ -139,7 +139,7 @@ public class Observable<T>: ObservableType<T> {
     ///
     /// - Parameter observer: observer to subscribe.
     /// - Returns: Disposable. Observer is subscribed until this disposable is deleted.
-    public override func subscribe(_ observer: Observer<T>) -> Disposable {
+    override public func subscribe(_ observer: Observer<T>) -> Disposable {
         if observers.isEmpty {
             willBeObserved()
         }
@@ -210,7 +210,7 @@ public class Observable<T>: ObservableType<T> {
         /// - Parameters:
         ///   - observable: observable the observer registered to
         ///   - identifier: observer identifier
-        init(observable: Observable<T>, identifier: ObjectIdentifier) {
+        fileprivate init(observable: Observable<T>, identifier: ObjectIdentifier) {
             self.observable = observable
             self.identifier = identifier
         }

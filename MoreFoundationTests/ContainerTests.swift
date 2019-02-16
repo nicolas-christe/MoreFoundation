@@ -94,11 +94,13 @@ class ContainerTests: XCTestCase {
     var container: Container!
 
     override func setUp() {
+        super.setUp()
         container = Container()
     }
 
     override func tearDown() {
         container = nil
+        super.tearDown()
     }
 
     func testSimpleService() throws {

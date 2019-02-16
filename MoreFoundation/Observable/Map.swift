@@ -33,12 +33,12 @@ private class Map<T, U>: ObservableType<U> {
     /// - Parameters:
     ///   - source: source observable
     ///   - transform: `T` to `U` transform closure
-    public init(source: ObservableType<T>, transform: @escaping (T) -> U) {
+    fileprivate init(source: ObservableType<T>, transform: @escaping (T) -> U) {
         self.source = source
         self.transform = transform
     }
 
-    override func subscribe(_ observer: Observer<U>) -> Disposable {
+    override fileprivate func subscribe(_ observer: Observer<U>) -> Disposable {
         return source.subscribe { event in
             switch event {
             case .next(let value):  observer.on(.next(self.transform(value)))

@@ -48,9 +48,6 @@ opt_in_rules:
 # Array and dictionary literal end should have the same indentation as the line that started it.
 - literal_expression_end_indentation
 
-# Ensure definitions have a lower access control level than their enclosing parent
-- lower_acl_than_parent
-
 # Modifier order should be consistent.
 - modifier_order
 

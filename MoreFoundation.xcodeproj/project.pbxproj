@@ -272,7 +272,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\nswiftlint --path \"$SRCROOT/$TARGETNAME\"\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint --path \"$SRCROOT/$TARGETNAME\" --config \"$SRCROOT\"/.swiftlint.yml\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		374E516021AA9E6C001ED3FD /* swiftlint */ = {
@@ -291,7 +291,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\necho \"$SRCROOT\"\nswiftlint --path \"$SRCROOT/$TARGETNAME\"\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint --path \"$SRCROOT/$TARGETNAME\" --config \"$SRCROOT\"/.swiftlint.yml\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

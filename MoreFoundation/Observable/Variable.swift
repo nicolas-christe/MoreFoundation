@@ -35,7 +35,7 @@ public class Variable<T>: Observable<T> {
         onNext(newValue)
     }
 
-    public override func onNext(_ value: T) {
+    override public func onNext(_ value: T) {
         self.value = value
         super.onNext(value)
     }

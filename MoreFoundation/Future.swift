@@ -142,7 +142,7 @@ public class Future<Success, Failure: Error> {
     public func then<U>(on queue: DispatchQueue? = nil,
                         _ block: @escaping (_ promise: Promise<U, Failure>, _ value: Success) -> Void)
         -> Future<U, Failure> {
-            return then(errorMapper: { return $0}, block)
+            return then(errorMapper: { $0 }, block)
     }
 
     /// Complete the future
@@ -177,7 +177,7 @@ public class Future<Success, Failure: Error> {
 /// A promise value
 public class Promise<Success, Failure: Error>: Future<Success, Failure> {
 
-    public override init() {
+    override public init() {
     }
 
     /// Fulfill the promise with a value
