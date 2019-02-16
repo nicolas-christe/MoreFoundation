@@ -20,33 +20,12 @@
 
 import Foundation
 
-/// A result that can be a value or an error
-public enum Result<Value> {
-    /// result is a value
-    case value(Value)
-    /// result is an error
-    case error(Error)
-
-    /// Get the result value
-    ///
-    /// - Returns: result value
-    /// - Throws: error if result is an error
-    public func get() throws -> Value {
-        switch self {
-        case .value(let val):
-            return val
-        case .error(let err):
-            throw err
-        }
-    }
-}
-
 /// A future value
-public class Future<Value> {
+public class Future<Success, Failure: Error> {
     /// Result, when future is completed
-    private var result: Result<Value>?
+    private var result: Result<Success, Failure>?
     /// List of waiters
-    private var awaiters = [(DispatchQueue?, (Result<Value>) -> Void)]()
+    private var awaiters = [(DispatchQueue?, (Result<Success, Failure>) -> Void)]()
     /// lock
     private let lockQueue = DispatchQueue(label: "MoreFoundation.Future")
     /// Block to call to cancel the function generating the Future
@@ -62,7 +41,8 @@ public class Future<Value> {
     ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
     ///   - completionBlock: completion block
     ///   - result: completed Future result
-    public func await(on queue: DispatchQueue? = nil, completionBlock: @escaping (_ result: Result<Value>) -> Void) {
+    public func await(on queue: DispatchQueue? = nil,
+                      completionBlock: @escaping (_ result: Result<Success, Failure>) -> Void) {
         if !cancelled {
             lockQueue.sync {
                 awaiters.append((queue, completionBlock))
@@ -80,9 +60,10 @@ public class Future<Value> {
     ///   - completionBlock: completion block
     ///   - result: completed Future result
     @discardableResult
-    public func done(on queue: DispatchQueue? = nil, completionBlock: @escaping (Value) -> Void) -> Future<Value> {
+    public func done(on queue: DispatchQueue? = nil,
+                     completionBlock: @escaping (Success) -> Void) -> Future<Success, Failure> {
         await(on: queue) { result in
-            if case let .value(value) = result {
+            if case let .success(value) = result {
                 completionBlock(value)
             }
         }
@@ -96,9 +77,10 @@ public class Future<Value> {
     ///   - completionBlock: completion block
     ///   - result: completed Future error
     @discardableResult
-    public func `catch`(on queue: DispatchQueue? = nil, completionBlock: @escaping (Error) -> Void) -> Future<Value> {
+    public func `catch`(on queue: DispatchQueue? = nil,
+                        completionBlock: @escaping (Failure) -> Void) -> Future<Success, Failure> {
         await(on: queue) { result in
-            if case let .error(error) = result {
+            if case let .failure(error) = result {
                 completionBlock(error)
             }
         }
@@ -129,31 +111,44 @@ public class Future<Value> {
     ///
     /// - Parameters:
     ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - errorMapper: block converting failure `F` to `Failure`
+    ///   - block: block to call when the future has completed
+    /// - Returns: new Future
+    public func then<U, F: Error>(on queue: DispatchQueue? = nil,
+                                  errorMapper: @escaping (Failure) -> F,
+                                  _ block: @escaping (_ promise: Promise<U, F>, _ value: Success) -> Void)
+        -> Future<U, F> {
+            let promise = Promise<U, F>()
+            promise.parentCancel = cancel
+            await(on: queue) { result in
+                switch result {
+                case .success(let value):
+                    block(promise, value)
+                case .failure(let error):
+                    promise.reject(with: errorMapper(error))
+                }
+            }
+            return promise
+    }
+
+    /// Call a new async function when the future has completed successfully.
+    ///
+    /// Special case when the new future has the same `Failure` type than the current one
+    ///
+    /// - Parameters:
+    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
     ///   - block: block to call when the future has completed
     /// - Returns: new Future
     public func then<U>(on queue: DispatchQueue? = nil,
-                        _ block: @escaping (_ promise: Promise<U>, _ value: Value) throws -> Void) -> Future<U> {
-        let promise = Promise<U>()
-        promise.parentCancel = cancel
-        await(on: queue) { result in
-            switch result {
-            case .value(let value):
-                do {
-                    try block(promise, value)
-                } catch {
-                    promise.reject(with: error)
-                }
-            case .error(let error):
-                promise.reject(with: error)
-            }
-        }
-        return promise
+                        _ block: @escaping (_ promise: Promise<U, Failure>, _ value: Success) -> Void)
+        -> Future<U, Failure> {
+            return then(errorMapper: { return $0}, block)
     }
 
     /// Complete the future
     ///
     /// - Parameter value: result
-    fileprivate func complete(with value: Result<Value>) {
+    fileprivate func complete(with value: Result<Success, Failure>) {
         if result == nil {
             result = value
             report(value)
@@ -163,8 +158,8 @@ public class Future<Value> {
     /// Notify waiters the future has completed
     ///
     /// - Parameter result: future result
-    private func report(_ result: Result<Value>) {
-        var awaiters = [(DispatchQueue?, (Result<Value>) -> Void)]()
+    private func report(_ result: Result<Success, Failure>) {
+        var awaiters = [(DispatchQueue?, (Result<Success, Failure>) -> Void)]()
         lockQueue.sync {
             awaiters = self.awaiters
             self.awaiters.removeAll()
@@ -180,7 +175,7 @@ public class Future<Value> {
 }
 
 /// A promise value
-public class Promise<Value>: Future<Value> {
+public class Promise<Success, Failure: Error>: Future<Success, Failure> {
 
     public override init() {
     }
@@ -188,15 +183,15 @@ public class Promise<Value>: Future<Value> {
     /// Fulfill the promise with a value
     ///
     /// - Parameter value: promise value
-    public func fulfill(with value: Value) {
-        complete(with: .value(value))
+    public func fulfill(with value: Success) {
+        complete(with: .success(value))
     }
 
     /// Reject the promise with an error
     ///
     /// - Parameter error: promise error
-    public func reject(with error: Error) {
-        complete(with: .error(error))
+    public func reject(with error: Failure) {
+        complete(with: .failure(error))
     }
 
     /// Register the bloc to call when the future is cancelled
@@ -213,8 +208,9 @@ public class Promise<Value>: Future<Value> {
 ///   - block: async block
 ///   - promise: promise passed to the async block
 /// - Returns: future
-public func async<T>(block: (_ promise: Promise<T>) -> Void) -> Future<T> {
-    let promise = Promise<T>()
-    block(promise)
-    return promise
+public func async<Success, Failure: Error>(block: (_ promise: Promise<Success, Failure>) -> Void)
+    -> Future<Success, Failure> {
+        let promise = Promise<Success, Failure>()
+        block(promise)
+        return promise
 }

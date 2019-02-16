@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		371AEB3C2217548300DCFB3B /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AEB3B2217548300DCFB3B /* Result.swift */; };
 		372D5CB121B3E07500AE1202 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372D5CB021B3E07500AE1202 /* EventStore.swift */; };
 		3741CA8B21A7022900A1FE96 /* Hamcrest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3741CA8A21A7022900A1FE96 /* Hamcrest.framework */; };
 		374E516221AAB041001ED3FD /* Fatal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374E516121AAB041001ED3FD /* Fatal.swift */; };
@@ -52,6 +53,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		371AEB3B2217548300DCFB3B /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		372D5CB021B3E07500AE1202 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
 		3741CA8A21A7022900A1FE96 /* Hamcrest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Hamcrest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		374E516121AAB041001ED3FD /* Fatal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fatal.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				3763002F21A6D1E900B61F33 /* Disposable.swift */,
 				376443AE21AE70FA0092BCE8 /* Observable */,
 				37A7B45621C66AE400126D02 /* Future.swift */,
+				371AEB3B2217548300DCFB3B /* Result.swift */,
 				37CFBB0F21AD7A13003DC9C9 /* Container.swift */,
 				374E516121AAB041001ED3FD /* Fatal.swift */,
 				37A7B45A21CD752200126D02 /* Applicable.swift */,
@@ -302,6 +305,7 @@
 				3763003721A6D2A000B61F33 /* Observable.swift in Sources */,
 				37A7B45B21CD752200126D02 /* Applicable.swift in Sources */,
 				3763003A21A6D8B500B61F33 /* Variable.swift in Sources */,
+				371AEB3C2217548300DCFB3B /* Result.swift in Sources */,
 				3793335A21A6E0F000014386 /* Value.swift in Sources */,
 				376049F12204E7C30086BD75 /* CompactMap.swift in Sources */,
 				374E516221AAB041001ED3FD /* Fatal.swift in Sources */,

@@ -26,7 +26,7 @@ private enum Error: Swift.Error {
     case fail
 }
 
-private func asyncFunc(promise: Promise<String>, val: String?) {
+private func asyncFunc(promise: Promise<String, Error>, val: String?) {
     DispatchQueue.main.async {
         if let val = val {
             promise.fulfill(with: val)
@@ -51,7 +51,7 @@ class FutureTests: XCTestCase {
 
     func testAwaitAlreadyCompleted() {
         let expectation = XCTestExpectation(description: "promise is fulfilled")
-        async { promise in
+        async { (promise: Promise<String, Error>) in
             promise.fulfill(with: "X")
             }.await { result in
                 assertThat(try? result.get(), presentAnd(`is`("X")))
@@ -76,7 +76,7 @@ class FutureTests: XCTestCase {
         async { promise in
             asyncFunc(promise: promise, val: nil)
             }.catch { error in
-                assertThat(error as? Error, `is`(Error.fail))
+                assertThat(error, `is`(Error.fail))
                 expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1.0)
@@ -112,7 +112,7 @@ class FutureTests: XCTestCase {
         async { promise in
             asyncFunc(promise: promise, val: nil)
             }.catch { error in
-                assertThat(error as? Error, `is`(Error.fail))
+                assertThat(error, `is`(Error.fail))
                 expectation1.fulfill()
             }.finally {
                 expectation2.fulfill()
@@ -140,7 +140,7 @@ class FutureTests: XCTestCase {
             }.then { promise, value in
                 asyncFunc(promise: promise, val: value + "Y")
             }.catch { error in
-                assertThat(error as? Error, `is`(Error.fail))
+                assertThat(error, `is`(Error.fail))
                 expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1.0)
@@ -153,7 +153,7 @@ class FutureTests: XCTestCase {
             }.then { promise, _ in
                 asyncFunc(promise: promise, val: nil)
             }.catch { error in
-                assertThat(error as? Error, `is`(Error.fail))
+                assertThat(error, `is`(Error.fail))
                 expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1.0)
@@ -164,7 +164,7 @@ class FutureTests: XCTestCase {
         var cancel2Called = false
         async { promise in
             promise.registerCancel({ cancel1Called = true })
-            }.then { (promise: Promise<Void>, _: Void) in
+            }.then { (promise: Promise<Void, Error>, _: Void) in
                 promise.registerCancel({ cancel2Called = true })
             }.cancel()
         assertThat(cancel1Called, `is`(true))
@@ -177,7 +177,7 @@ class FutureTests: XCTestCase {
         async { promise in
             promise.registerCancel({ cancel1Called = true })
             promise.fulfill(with: ())
-            }.then { (promise: Promise<Void>, _: Void) in
+            }.then { (promise: Promise<Void, Error>, _: Void) in
                 promise.registerCancel({ cancel2Called = true })
             }.cancel()
         assertThat(cancel1Called, `is`(false))
