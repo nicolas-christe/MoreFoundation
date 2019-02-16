@@ -65,7 +65,7 @@ private class CompactMap<T, U>: ObservableType<U> where T: OptionalType {
 
 public extension ObservableType where T: OptionalType {
 
-    /// Convert from an `Event` data type to `U`
+    /// Convert from an `Event` data type to `U`, ignoring nil value events
     ///
     /// - Parameters:
     ///     - transform: closure called to transform `T` to `U`
@@ -75,6 +75,9 @@ public extension ObservableType where T: OptionalType {
             return CompactMap(source: self, transform: transform)
     }
 
+    /// Ignoring nil value events
+    ///
+    /// - Returns: a new observable
     func compactMap() -> ObservableType<T.WrappedType> {
         return CompactMap(source: self, transform: { $0 })
     }

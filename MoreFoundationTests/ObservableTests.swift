@@ -179,6 +179,24 @@ class ObservableTests: XCTestCase {
         assertThat(events, contains(.next(3), .terminated))
     }
 
+    func testCompactMapSaveType() {
+        let bag = DisposeBag()
+        let observable = Observable<String?>()
+
+        var events = [Event<String>]()
+
+        observable.compactMap().subscribe({ events.append($0) }).disposed(by: bag)
+
+        observable.onNext(nil)
+        assertThat(events, `is`(empty()))
+
+        observable.onNext("123")
+        assertThat(events, contains(.next("123")))
+
+        observable.onTerminated()
+        assertThat(events, contains(.next("123"), .terminated))
+    }
+
     // test ".filter()" function
     func testFilter() {
         let bag = DisposeBag()
