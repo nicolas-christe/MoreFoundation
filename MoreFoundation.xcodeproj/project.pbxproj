@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		371AA56F2218119E00E9392D /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AA56E2218119E00E9392D /* Http.swift */; };
 		371AEB3C2217548300DCFB3B /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371AEB3B2217548300DCFB3B /* Result.swift */; };
 		372D5CB121B3E07500AE1202 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372D5CB021B3E07500AE1202 /* EventStore.swift */; };
 		3741CA8B21A7022900A1FE96 /* Hamcrest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3741CA8A21A7022900A1FE96 /* Hamcrest.framework */; };
 		374E516221AAB041001ED3FD /* Fatal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 374E516121AAB041001ED3FD /* Fatal.swift */; };
+		375E00EB22195B3400DB489C /* HttpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375E00EA22195B3400DB489C /* HttpTests.swift */; };
 		376049F12204E7C30086BD75 /* CompactMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376049F02204E7C30086BD75 /* CompactMap.swift */; };
 		376049F32205A0680086BD75 /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376049F22205A0680086BD75 /* Bindable.swift */; };
 		3763003021A6D1E900B61F33 /* Disposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3763002F21A6D1E900B61F33 /* Disposable.swift */; };
@@ -53,10 +55,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		371AA56E2218119E00E9392D /* Http.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		371AEB3B2217548300DCFB3B /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		372D5CB021B3E07500AE1202 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
 		3741CA8A21A7022900A1FE96 /* Hamcrest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Hamcrest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		374E516121AAB041001ED3FD /* Fatal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fatal.swift; sourceTree = "<group>"; };
+		375E00EA22195B3400DB489C /* HttpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpTests.swift; sourceTree = "<group>"; };
 		376049F02204E7C30086BD75 /* CompactMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompactMap.swift; sourceTree = "<group>"; };
 		376049F22205A0680086BD75 /* Bindable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindable.swift; sourceTree = "<group>"; };
 		3763002C21A6D1E900B61F33 /* libMoreFoundation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoreFoundation.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,6 +140,7 @@
 				37CFBB0F21AD7A13003DC9C9 /* Container.swift */,
 				374E516121AAB041001ED3FD /* Fatal.swift */,
 				37A7B45A21CD752200126D02 /* Applicable.swift */,
+				371AA56E2218119E00E9392D /* Http.swift */,
 			);
 			path = MoreFoundation;
 			sourceTree = "<group>";
@@ -162,6 +167,7 @@
 				376443AA21ADDA9C0092BCE8 /* ContainerTests.swift */,
 				37A7B45821C6DB0C00126D02 /* FutureTests.swift */,
 				37A7B45C21CD769300126D02 /* ApplicableTests.swift */,
+				375E00EA22195B3400DB489C /* HttpTests.swift */,
 				3793336321A6E25500014386 /* Info.plist */,
 			);
 			path = MoreFoundationTests;
@@ -315,6 +321,7 @@
 				378FA15A21B5B25F00140E04 /* Filter.swift in Sources */,
 				37A7B45721C66AE400126D02 /* Future.swift in Sources */,
 				3763003021A6D1E900B61F33 /* Disposable.swift in Sources */,
+				371AA56F2218119E00E9392D /* Http.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,6 +330,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37A7B45D21CD769300126D02 /* ApplicableTests.swift in Sources */,
+				375E00EB22195B3400DB489C /* HttpTests.swift in Sources */,
 				3793336221A6E25500014386 /* ObservableTests.swift in Sources */,
 				376443AB21ADDA9C0092BCE8 /* ContainerTests.swift in Sources */,
 				37A7B45921C6DB0C00126D02 /* FutureTests.swift in Sources */,

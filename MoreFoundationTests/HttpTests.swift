@@ -1,4 +1,4 @@
-/// Copyright (c) 2018 Nicolas Christe
+/// Copyright (c) 2019 Nicolas Christe
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -22,33 +22,28 @@ import XCTest
 import MoreFoundation
 import Hamcrest
 
-class ApplyTests: XCTestCase {
+class HttpTests: XCTestCase {
 
-    func testApplyOnObject() {
-        class MyClass: Applicable {
-            var val = 0
-        }
-        let myObj = MyClass().apply {
-            $0.val = 42
-        }
-        assertThat(myObj.val, `is`(42))
+    func testGetFlatQueryParams() {
+        let urlBase = URL(string: "http://www.nixit.co.uk")!
+
+        let url = urlBase.appending(queryParams: ["p1": "1", "p2": "2", "p3": nil])
+
+        let queryParams = url.flatQueryParams
+        assertThat(queryParams, presentAnd(allOf(
+            hasEntry("p1", "1"),
+            hasEntry("p2", "2"),
+            hasEntry("p3", nil))))
     }
 
-    func testApplyOnStruct() {
-        struct MyStruct: Applicable {
-            var val = 0
-        }
-        let myObj = MyStruct().apply {
-            $0.val = 42
-        }
-        assertThat(myObj.val, `is`(42))
-    }
+    func testGetQueryParams() {
+        let urlBase = URL(string: "http://www.nixit.co.uk")!
 
-    func testApplyOnNSObject() {
-        let dateFormatter = DateFormatter().apply {
-            assertThat($0.dateStyle, `is`(.none))
-            $0.dateStyle = .long
-        }
-        assertThat(dateFormatter.dateStyle, `is`(.long))
+        let url = urlBase.appending(queryParams: ["p1": ["1", "2"], "p3": []])
+
+        let queryParams = url.queryParams
+        assertThat(queryParams, presentAnd(allOf(
+            hasEntry("p1", ["1", "2"]),
+            hasEntry("p3", []))))
     }
 }
