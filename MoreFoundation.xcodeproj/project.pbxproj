@@ -225,9 +225,11 @@
 				TargetAttributes = {
 					3763002B21A6D1E900B61F33 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 					};
 					3793335E21A6E25500014386 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -297,7 +299,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\nswiftlint --path \"$SRCROOT/$TARGETNAME\" --config \"$SRCROOT\"/.swiftlint.yml\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
+			shellScript = "\"$SRCROOT/tools/swiftlint/swiftlint\" --path \"$SRCROOT/$TARGETNAME\" --config \"$SRCROOT/tools/config/swiftlint.yml\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
