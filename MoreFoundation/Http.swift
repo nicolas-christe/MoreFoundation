@@ -54,7 +54,7 @@ public extension Array where Element == URLQueryItem {
 // MARK: - URLComponents
 public extension URLComponents {
     /// query items as dictionary, supporting mulitple value for each key
-    public var queryParams: [String: [String]]? {
+    var queryParams: [String: [String]]? {
         get {
             return queryItems?.asDictionnary
         }
@@ -68,7 +68,7 @@ public extension URLComponents {
     }
 
     /// query items as dictionary, with a single value for each key
-   public var flatQueryParams: [String: String?]? {
+    var flatQueryParams: [String: String?]? {
         get {
             return queryItems?.asFlatDictionnary
         }
@@ -123,7 +123,7 @@ public extension URL {
 
 /// Extends URLRequest to add constructor with parametres
 public extension URLRequest {
-    public enum Method: String {
+    enum Method: String {
         case get = "GET"
         case post = "POST"
         case put = "PUT"
@@ -137,7 +137,7 @@ public extension URLRequest {
     ///   - method: request methods
     ///   - headers: request headers
     ///   - body: body as UTF8 encoded string
-    public init(url: URL, method: Method, headers: [String: String]? = nil, body: Data? = nil) {
+    init(url: URL, method: Method, headers: [String: String]? = nil, body: Data? = nil) {
         self.init(url: url)
         self.httpMethod = method.rawValue
         self.allHTTPHeaderFields = headers
@@ -151,7 +151,7 @@ public extension URLRequest {
     ///   - method: request methods
     ///   - headers: request headers
     ///   - body: body as UTF8 encoded string
-    public init(url: URL, method: Method, headers: [String: String]? = nil, body: String) {
+    init(url: URL, method: Method, headers: [String: String]? = nil, body: String) {
         self.init(url: url, method: method, headers: headers, body: body.data(using: .utf8))
     }
  }

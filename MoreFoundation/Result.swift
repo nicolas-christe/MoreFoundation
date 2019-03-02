@@ -1,5 +1,9 @@
 /// **** Temporay import of Swift 5 Result type ****
 
+#if swift(>=5)
+// uses Result from stdlib
+#else
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the Swift.org open source project
@@ -148,23 +152,10 @@ public enum Result<Success, Failure: Error> {
     }
 }
 
-#if swift(>=5)
-extension Result where Failure == Swift.Error {
-    /// Creates a new result by evaluating a throwing closure, capturing the
-    /// returned value as a success, or any thrown error as a failure.
-    ///
-    /// - Parameter body: A throwing closure to evaluate.
-    @_transparent
-    public init(catching body: () throws -> Success) {
-        do {
-            self = .success(try body())
-        } catch {
-            self = .failure(error)
-        }
-    }
-}
-#endif
-
 extension Result: Equatable where Success: Equatable, Failure: Equatable { }
 
 extension Result: Hashable where Success: Hashable, Failure: Hashable { }
+
+#endif
+
+// TODO

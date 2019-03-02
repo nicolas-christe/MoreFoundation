@@ -276,7 +276,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\nswiftlint --path \"$SRCROOT/$TARGETNAME\" --config \"$SRCROOT\"/.swiftlint.yml\nelse\necho \"warning: SwiftLint not installed\"\nfi\n";
+			shellScript = "\"$SRCROOT/tools/swiftlint/swiftlint\" --path \"$SRCROOT/$TARGETNAME\" --config \"$SRCROOT/tools/config/swiftlint.yml\"\n";
 			showEnvVarsInLog = 0;
 		};
 		374E516021AA9E6C001ED3FD /* swiftlint */ = {
