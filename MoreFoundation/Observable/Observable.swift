@@ -187,7 +187,7 @@ public class Observable<T>: ObservableType<T> {
         self.wasObservedCb()
     }
 
-    /// Unsubsribe an observer
+    /// Unsubscribe an observer
     ///
     /// - Parameter identifier: observer identifier.
     private func unsubscribe(_ identifier: ObjectIdentifier) {

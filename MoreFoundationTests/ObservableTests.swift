@@ -57,7 +57,7 @@ class ObservableTests: XCTestCase {
         assertThat(wasObserved, `is`(1))
     }
 
-    /// Test subcribe
+    /// Test subscribe
     func testSubscribe() {
         let bag1 = DisposeBag()
         let bag2 = DisposeBag()
@@ -78,7 +78,7 @@ class ObservableTests: XCTestCase {
         assertThat(events1, contains(.next("X"), .next("Y")))
         assertThat(events2, contains(.next("Y")))
 
-        // check that unregisted observers are not notified
+        // check that unregistered observers are not notified
         bag1.dispose()
         observable.onNext("Z")
         assertThat(events1, contains(.next("X"), .next("Y")))
@@ -90,6 +90,7 @@ class ObservableTests: XCTestCase {
         assertThat(events2, contains(.next("Y"), .next("Z"), .terminated))
     }
 
+    /// Test subscribe with EventHandler
     func testSubscribeHandlers() {
         let bag = DisposeBag()
         let observable = Observable<String>()
@@ -97,37 +98,47 @@ class ObservableTests: XCTestCase {
         var values = [String]()
         var terminated = 0
 
+        // subscribe all event handlers
         observable.subscribe(
             .onEvent { events.append($0) },
             .onNext { values.append($0) },
             .onTerminated { terminated += 1 })
         .disposed(by: bag)
 
+        // check initial value
         assertThat(events, `is`(empty()))
         assertThat(values, `is`(empty()))
         assertThat(terminated, `is`(0))
 
+        // send a next event
         observable.onNext("X")
+        // check notification
         assertThat(events, contains(.next("X")))
         assertThat(values, contains("X"))
         assertThat(terminated, `is`(0))
 
+        // send terminate event
         observable.onTerminated()
+        // check notifications
         assertThat(events, contains(.next("X"), .terminated))
         assertThat(values, contains("X"))
         assertThat(terminated, `is`(1))
     }
 
+    /// Tests terminated event is send immediately when subscribing to a terminated observable
     func testSubscribeOnTerminatedObservable() {
         let bag = DisposeBag()
         let observable = Observable<String>()
         var events = [Event<String>]()
-
+        // terminate the observable
         observable.onTerminated()
+        // subscribe to terminated observable
         observable.subscribe({ events.append($0) }).disposed(by: bag)
+        // check that terminated event has been received
         assertThat(events, contains(.terminated))
     }
 
+    /// Tests that calling onNext on a terminated observable generates a fatal error
     func testOnNextOnTerminatedObservable() {
         let expectation = self.expectation(description: "expectingFatal")
         fatalInterceptor = { _ in

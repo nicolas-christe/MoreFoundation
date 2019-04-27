@@ -20,7 +20,7 @@
 
 import Foundation
 
-/// Convert from an Observeable with `Event<T>` to and Observeable with `Event<U>`
+/// Convert from an Observeable with `Event<T>` to an Observeable with `Event<U>`
 private class Map<T, U>: ObservableType<U> {
 
     /// Source observable
