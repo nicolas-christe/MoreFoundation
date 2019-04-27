@@ -42,7 +42,10 @@ public class Variable<T>: Observable<T> {
 
     override public func subscribe(_ observer: Observer<T>) -> Disposable {
         let result = super.subscribe(observer)
-        onNext(value)
+        if !terminated {
+            // forward initial value to the newly registered observer
+            observer.on(.next(value))
+        }
         return result
     }
 }

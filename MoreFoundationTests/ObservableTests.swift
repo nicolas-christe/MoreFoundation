@@ -231,38 +231,60 @@ class ObservableTests: XCTestCase {
         let bag = DisposeBag()
         let variable = Variable<String>("X")
 
-        var events = [Event<String>]()
-        variable.subscribe({ events.append($0) }).disposed(by: bag)
+        var events1 = [Event<String>]()
+        variable.subscribe({ events1.append($0) }).disposed(by: bag)
         // ensure that initial value is notified
-        assertThat(events, contains(.next("X")))
+        assertThat(events1, contains(.next("X")))
 
         variable.set("Y")
-        assertThat(events, contains(.next("X"), .next("Y")))
+        assertThat(events1, contains(.next("X"), .next("Y")))
+
+        // start 2nd subscription
+        var events2 = [Event<String>]()
+        variable.subscribe({ events2.append($0) }).disposed(by: bag)
+
+        // ensure that initial value is notified only on the observable that did just subscribe
+        assertThat(events2, contains(.next("Y")))
+        assertThat(events1, contains(.next("X"), .next("Y")))
     }
 
     func testValue() {
         let bag = DisposeBag()
         let observable = Observable<String>()
 
+        // check initial value
         let value = Value("I")
         assertThat(value.value, presentAnd(`is`("I")))
 
+        // bind the value to an observable
         value.bind(to: observable)
         assertThat(value.value, presentAnd(`is`("I")))
 
+        // check observable next event
         observable.onNext("X")
         assertThat(value.value, presentAnd(`is`("X")))
 
-        var events = [Event<String>]()
-        value.subscribe({ events.append($0) }).disposed(by: bag)
-        assertThat(events, contains(.next("X")))
+        // check subscribing to the Value events
+        var events1 = [Event<String>]()
+        value.subscribe({ events1.append($0) }).disposed(by: bag)
+        assertThat(events1, contains(.next("X")))
 
+        // check that observable next events are forwarded to subscriber
         observable.onNext("Y")
         assertThat(value.value, presentAnd(`is`("Y")))
-        assertThat(events, contains(.next("X"), .next("Y")))
+        assertThat(events1, contains(.next("X"), .next("Y")))
 
+        // start 2nd subscription
+        var events2 = [Event<String>]()
+        value.subscribe({ events2.append($0) }).disposed(by: bag)
+
+        // ensure that initial value is notified only on the observable that did just subscribe
+        assertThat(events2, contains(.next("Y")))
+        assertThat(events1, contains(.next("X"), .next("Y")))
+
+        // check that observable terminated events are forwarded to subscriber
         observable.onTerminated()
-        assertThat(events, contains(.next("X"), .next("Y"), .terminated))
+        assertThat(events1, contains(.next("X"), .next("Y"), .terminated))
     }
 
     func testBind() {
