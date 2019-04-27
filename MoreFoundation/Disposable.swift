@@ -26,22 +26,26 @@ public protocol Disposable: AnyObject {
 }
 
 extension Disposable {
-    /// Put a disposble on a dispose bag
+    /// Put a disposable on a dispose bag
     ///
-    /// - Parameter disposeBag: dispoable to put in the dispose bag
+    /// - Parameter disposeBag: disposable to put in the dispose bag
     public func disposed(by disposeBag: DisposeBag) {
         disposeBag.add(disposable: self)
     }
 }
 
 /// Hold strong references on `Disposable` object
-public class DisposeBag {
+public class DisposeBag: Disposable {
 
+    /// List of disposable in the bag
     private var disposables = [Disposable]()
 
     public init() {
     }
 
+    /// Add a disposable into the bag
+    ///
+    /// - Parameter disposable: disposable to add
     fileprivate func add(disposable: Disposable) {
         disposables.append(disposable)
     }
