@@ -1,4 +1,4 @@
-/// Copyright (c) 2018 Nicolas Christe
+/// Copyright (c) 2018-19 Nicolas Christe
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,11 @@ private enum Error: Swift.Error {
     case fail
 }
 
+/// An async fun
+///
+/// - Parameters:
+///   - promise: promise to complete asynchronous
+///   - val: value to fulfil the promise with. If nil the promise is rejected with Error.fail.
 private func asyncFunc(promise: Promise<String, Error>, val: String?) {
     DispatchQueue.main.async {
         if let val = val {
@@ -38,6 +43,7 @@ private func asyncFunc(promise: Promise<String, Error>, val: String?) {
 
 class FutureTests: XCTestCase {
 
+    /// Test `await`
     func testAwait() {
         let expectation = XCTestExpectation(description: "promise is fulfilled")
         async { promise in
@@ -49,6 +55,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// Test calling `await` on a future that has already completed.
     func testAwaitAlreadyCompleted() {
         let expectation = XCTestExpectation(description: "promise is fulfilled")
         async { (promise: Promise<String, Error>) in
@@ -60,6 +67,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// Test `done` is called when the future is fulfilled
     func testDone() {
         let expectation = XCTestExpectation(description: "Done called")
         async { promise in
@@ -71,6 +79,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// Test `catch` is called when the future is rejected
     func testCatch() {
         let expectation = XCTestExpectation(description: "Catch called")
         async { promise in
@@ -82,6 +91,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// Test `finally` is called
     func testFinally() {
         let expectation = XCTestExpectation(description: "Finally called")
         async { promise in
@@ -92,6 +102,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    // Test that `finally` is called after `done`
     func testDoneFinally() {
         let expectation1 = XCTestExpectation(description: "Done Called")
         let expectation2 = XCTestExpectation(description: "finally called")
@@ -106,6 +117,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation1, expectation2], timeout: 1.0)
     }
 
+    // Test that `finally` is called after `catch`
     func testCatchFinally() {
         let expectation1 = XCTestExpectation(description: "Catch Called")
         let expectation2 = XCTestExpectation(description: "finally called")
@@ -120,6 +132,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation1, expectation2], timeout: 1.0)
     }
 
+    /// Test `then`
     func testThen() {
         let expectation = XCTestExpectation(description: "promise is fulfilled")
         async { promise in
@@ -133,6 +146,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// Test `then` when the first future is rejected, expect `catch` to be called
     func testThen1stFail() {
         let expectation = XCTestExpectation(description: "catch called")
         async { promise in
@@ -146,6 +160,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// Test `then` when the 2nd future is rejected, expect `catch` to be called
     func testThen2ndFail() {
         let expectation = XCTestExpectation(description: "catch called")
         async { promise in
@@ -159,6 +174,7 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    /// test cancelling 2 chained feature, when `cancel` is called while the 1st future is pending
     func testCancel1st() {
         var cancel1Called = false
         var cancel2Called = false
@@ -171,6 +187,7 @@ class FutureTests: XCTestCase {
         assertThat(cancel2Called, `is`(false))
     }
 
+    /// test cancelling 2 chained feature, when `cancel` is called while the 2nd future is pending
     func testCancel2nd() {
         var cancel1Called = false
         var cancel2Called = false
@@ -184,6 +201,7 @@ class FutureTests: XCTestCase {
         assertThat(cancel2Called, `is`(true))
     }
 
+    /// Test `await` on a specific queue
     func testQueue() {
         let queue = DispatchQueue(label: "test")
 
@@ -191,6 +209,21 @@ class FutureTests: XCTestCase {
         async { promise in
             asyncFunc(promise: promise, val: "X")
             }.await(on: queue ) { result in
+                dispatchPrecondition(condition: .onQueue(queue))
+                assertThat(try? result.get(), presentAnd(`is`("X")))
+                expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+    }
+
+    /// Test dispatching future on a specific queue
+    func testDispatch() {
+        let queue = DispatchQueue(label: "test")
+
+        let expectation = XCTestExpectation(description: "promise is fulfilled")
+        async { promise in
+            asyncFunc(promise: promise, val: "X")
+            }.dispatch(on: queue).await { result in
                 dispatchPrecondition(condition: .onQueue(queue))
                 assertThat(try? result.get(), presentAnd(`is`("X")))
                 expectation.fulfill()

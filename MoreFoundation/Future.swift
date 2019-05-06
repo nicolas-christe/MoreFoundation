@@ -1,4 +1,4 @@
-/// Copyright (c) 2018 Nicolas Christe
+/// Copyright (c) 2018-19 Nicolas Christe
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -38,25 +38,25 @@ public class Future<Success, Failure: Error> {
     /// Call completion block when the Future has completed
     ///
     /// - Parameters:
-    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
     ///   - completionBlock: completion block
     ///   - result: completed Future result
     public func await(on queue: DispatchQueue? = nil,
                       completionBlock: @escaping (_ result: Result<Success, Failure>) -> Void) {
-        if !cancelled {
-            lockQueue.sync {
-                awaiters.append((queue, completionBlock))
-            }
-            if let result = result {
-                report(result)
-            }
+        lockQueue.sync {
+            awaiters.append((queue, completionBlock))
+        }
+        if let result = result {
+            report(result)
         }
     }
 
     /// Call completion block when the Future has completed successfully
     ///
     /// - Parameters:
-    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
     ///   - completionBlock: completion block
     ///   - result: completed Future result
     @discardableResult
@@ -73,7 +73,8 @@ public class Future<Success, Failure: Error> {
     /// Call completion block when the Future has completed with an error
     ///
     /// - Parameters:
-    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
     ///   - completionBlock: completion block
     ///   - result: completed Future error
     @discardableResult
@@ -90,7 +91,8 @@ public class Future<Success, Failure: Error> {
     /// Call completion block when the Future has completed
     ///
     /// - Parameters:
-    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
     ///   - completionBlock: completion block
     public func finally(on queue: DispatchQueue? = nil, completionBlock: @escaping () -> Void) {
         await(on: queue) { _ in
@@ -98,7 +100,21 @@ public class Future<Success, Failure: Error> {
         }
     }
 
+    /// Dispatch the future on a sepecific queue.
+    ///
+    /// - Parameter queue: queue to dispatch on
+    /// - Returns: a new future that will complte on the given queue
+    public func dispatch(on queue: DispatchQueue) -> Future<Success, Failure> {
+        let promise = Promise<Success, Failure>()
+        await(on: queue) { result in
+            promise.complete(with: result)
+        }
+        return promise
+    }
+
     /// Cancel the Future
+    /// Mark the future as cancelled. The underlaying asynchronous task may or may not be cancelled, and the
+    /// future will still be completed or rejected.
     public func cancel() {
         cancelled = true
         if result == nil {
@@ -110,7 +126,8 @@ public class Future<Success, Failure: Error> {
     /// Call a new async function when the future has completed successfully
     ///
     /// - Parameters:
-    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
     ///   - errorMapper: block converting failure `F` to `Failure`
     ///   - block: block to call when the future has completed
     /// - Returns: new Future
@@ -136,7 +153,8 @@ public class Future<Success, Failure: Error> {
     /// Special case when the new future has the same `Failure` type than the current one
     ///
     /// - Parameters:
-    ///   - queue: queue to call the completion block on, nil to call it on the default async function thread
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
     ///   - block: block to call when the future has completed
     /// - Returns: new Future
     public func then<U>(on queue: DispatchQueue? = nil,
@@ -195,6 +213,8 @@ public class Promise<Success, Failure: Error>: Future<Success, Failure> {
     }
 
     /// Register the bloc to call when the future is cancelled
+    /// It's up to the implementation to cancel the underlaying asynchronous task, and if cancelled, to complete or
+    /// reject the promise.
     ///
     /// - Parameter cancelBlock: bloc to call when the future is cancelled
     public func registerCancel(_ cancelBlock: @escaping () -> Void) {
