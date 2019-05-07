@@ -1,4 +1,3 @@
-// Copyright (c) 2017-19 Nicolas Christe
 /// Copyright (c) 2017-19 Nicolas Christe
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,7 +48,6 @@ public extension Array where Element == URLQueryItem {
     init(from dictionary: [String: String?]) {
         self = dictionary.map { URLQueryItem(name: $0.key, value: $0.value) }
     }
-
 }
 
 // MARK: - URLComponents
@@ -120,6 +118,17 @@ public extension URL {
     }
 }
 
+// MARK: - URL
+public extension URL {
+    /// URL safe constructor from a static string
+    init(staticString string: StaticString) {
+        guard let url = URL(string: "\(string)") else {
+            fatal("Invalid static URL string: \(string)")
+        }
+        self = url
+    }
+}
+
 // MARK: - URLRequest
 
 /// Extends URLRequest to add constructor with parametres
@@ -138,8 +147,9 @@ public extension URLRequest {
     ///   - method: request methods
     ///   - headers: request headers
     ///   - body: body as UTF8 encoded string
-    init(url: URL, method: Method, headers: [String: String]? = nil, body: Data? = nil) {
-        self.init(url: url)
+    init(url: URL, cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy, timeoutInterval: TimeInterval = 60.0,
+         method: Method, headers: [String: String]? = nil, body: Data? = nil) {
+        self.init(url: url, cachePolicy: cachePolicy, timeoutInterval: timeoutInterval)
         self.httpMethod = method.rawValue
         self.allHTTPHeaderFields = headers
         self.httpBody = body
@@ -152,7 +162,49 @@ public extension URLRequest {
     ///   - method: request methods
     ///   - headers: request headers
     ///   - body: body as UTF8 encoded string
-    init(url: URL, method: Method, headers: [String: String]? = nil, body: String) {
+    init(url: URL, cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy, timeoutInterval: TimeInterval = 60.0,
+         method: Method, headers: [String: String]? = nil, body: String) {
         self.init(url: url, method: method, headers: headers, body: body.data(using: .utf8))
     }
- }
+}
+
+/// An HTTP error code
+public enum HttpError: Error, Equatable {
+    /// Error
+    /// - Parameter: statusCode: http status code
+    case error(statusCode: Int)
+}
+
+// MARK: - URLSession
+public extension URLSession {
+
+    /// Create and resume a datatask to read a resource
+    ///
+    /// - Parameters:
+    ///   - request: url request
+    ///   - additionalAcceptableStatusCodes: additionnal valid status code. 200 to 300 are already considered as valid
+    ///     status codes.
+    ///   - promise: promise to fullfill or reject when the datatask has been executed. Promise is rejected
+    ///   if the task complete with a status code other that 2xx.
+    func httpDataTask(request: URLRequest, additionalAcceptableStatusCodes: Set<Int> = [],
+                      promise: Promise<(statusCode: Int, headers: [String: String], body: Data), Error>) {
+        let dataTask = self.dataTask(with: request) { data, response, error in
+            if let error = error {
+                promise.reject(with: error)
+            } else if let response = response as? HTTPURLResponse {
+                if 200..<300 ~= response.statusCode || additionalAcceptableStatusCodes.contains(response.statusCode),
+                    let headers = response.allHeaderFields as? [String: String], let data = data {
+                    promise.fulfill(with: (response.statusCode, headers, data))
+                } else {
+                    promise.reject(with: HttpError.error(statusCode: response.statusCode))
+                }
+            } else {
+                promise.reject(with: NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown, userInfo: nil))
+            }
+        }
+        promise.registerCancel {
+            dataTask.cancel()
+        }
+        dataTask.resume()
+    }
+}
