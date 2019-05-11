@@ -59,12 +59,12 @@ public class Container {
     /// Queue in with services are instanced
     private let queue: DispatchQueue
     /// Queue identifier
-    private let dispatchSpecificKey = DispatchSpecificKey<Bool>()
+    private let dispatchSpecificKey = DispatchSpecificKey<ObjectIdentifier>()
 
     /// Constructor
     public init(queue: DispatchQueue = DispatchQueue(label: "Container")) {
         self.queue = queue
-        queue.setSpecific(key: dispatchSpecificKey, value: true)
+        queue.setSpecific(key: dispatchSpecificKey, value: ObjectIdentifier(self))
     }
 
     deinit {
@@ -89,7 +89,7 @@ public class Container {
     /// - Parameter descriptor: descriptor of the service to get
     /// - Returns: Service instance if found
     public func getService<S>(descriptor: ServiceDescriptor<S>) -> S {
-        if DispatchQueue.getSpecific(key: dispatchSpecificKey) == nil {
+        if DispatchQueue.getSpecific(key: dispatchSpecificKey) == ObjectIdentifier(self) {
             return queue.sync {
                 self.getServiceLocked(descriptor: descriptor)
             }
