@@ -100,10 +100,10 @@ public class Future<Success, Failure: Error> {
         }
     }
 
-    /// Dispatch the future on a sepecific queue.
+    /// Dispatch the future on a specific queue.
     ///
     /// - Parameter queue: queue to dispatch on
-    /// - Returns: a new future that will complte on the given queue
+    /// - Returns: a new future that will complete on the given queue
     public func dispatch(on queue: DispatchQueue) -> Future<Success, Failure> {
         let promise = Promise<Success, Failure>()
         await(on: queue) { result in
@@ -161,6 +161,19 @@ public class Future<Success, Failure: Error> {
                         _ block: @escaping (_ promise: Promise<U, Failure>, _ value: Success) -> Void)
         -> Future<U, Failure> {
             return then(errorMapper: { $0 }, block)
+    }
+
+    /// Transform the future result when the futuree has completed successfully.
+    ///
+    /// - Parameters:
+    ///   - queue: queue to call the completion block on. If nil the completion block may be called on any queue,
+    ///            including caller queue if the future did already complete.
+    ///   - transform: closure to transform successful result to U
+    /// - Returns: new Future
+    public func map<U>(on queue: DispatchQueue? = nil, transform: @escaping (Success) -> U) -> Future<U, Failure> {
+        return then(on: queue) { promise, value  in
+            promise.fulfill(with: transform(value))
+        }
     }
 
     /// Complete the future

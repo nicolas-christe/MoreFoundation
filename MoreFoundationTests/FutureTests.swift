@@ -174,6 +174,20 @@ class FutureTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    func testMap() {
+        let expectation = XCTestExpectation(description: "catch called")
+        var cnt: Int?
+        async { promise in
+            asyncFunc(promise: promise, val: "X")
+            }.map {
+                cnt = $0.count
+            }.finally {
+                assertThat(cnt, presentAnd(`is` (1)))
+                expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+    }
+
     /// test cancelling 2 chained feature, when `cancel` is called while the 1st future is pending
     func testCancel1st() {
         var cancel1Called = false
